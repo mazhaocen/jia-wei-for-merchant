@@ -2,9 +2,6 @@
   <div class="register" style="padding: 0">
     <header>忘记密码</header>
     <section class="content" style="padding-bottom: 0">
-      <div class="register-logo">
-        <!--<img src="../../assets/img/login/logo.png" alt="">-->
-      </div>
       <div>
         <ul class=" register-input account cl">
           <li><img src="../../assets/img/login/user.png" alt=""><input type="text" placeholder="请输入用户账号"></li>

@@ -151,6 +151,9 @@ ul.mint-actionsheet-list>li{
 .mint-msgbox-message {
   white-space: normal;
 }
+.register-btn p {
+  margin-top: 1rem;
+}
 .register-btn {
   color: #008842;
   text-align: center;
@@ -254,12 +257,10 @@ li.security > button.active {
   text-align: right;
   position: absolute;
   right: 0;
-  bottom: 5px;
+  top: 0;
   z-index: 200;
-  padding-right: 2rem;
-  color: red;
-  height: 1rem;
-  line-height: 1rem;
+  padding-right: 1.5rem;
+  color: #ff5956;
 }
 .add_goods .mint-cell-wrapper{
   background-size: 1px;

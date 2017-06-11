@@ -55,10 +55,10 @@
       </div>
       <div class="register-btn">
         <button @click="goToMyShop" :style="{}" :disabled="!goResult" :class="{'disabled':!goResult}">登录</button>
-        <p @click="goToForgotPwd"><!--<span class="fl">注册</span>--><span class="">忘记密码</span></p>
+        <p @click="goToForgotPwd" v-if="loginType=='account'"><span class="">忘记密码</span></p>
       </div>
     </section>
-    <footer @click="goToRegister">申请开店</footer>
+    <footer @click="goToRegister">注册</footer>
   </div>
 </template>
 
@@ -73,7 +73,6 @@
     data () {
       return {
         loginType: 'account',
-        isEmpty:true,
         userName:'',
         password:'',
         photoNum:'',
@@ -103,20 +102,21 @@
       changeInput (type,value) {
           switch (type){
             case 'userName':
-              if(!value.trim()){this.userErrMsg = '输入不能为空'
+              if(!value.trim()){
+                this.userErrMsg = '输入不能为空'
                 this.inputArr[0] = false
-                return} else{
-                this.userErrMsg = ''
+                return
               }
+                this.userErrMsg = ''
                 break
             case 'password':
-              if(!value.trim()){this.pwdErrMsg = '输入不能为空'
+              if(!value.trim()){
+                this.pwdErrMsg = '输入不能为空'
                 this.inputArr[1] = false
-                return}
-                else{
+                return
+              }
                 this.pwdErrMsg = ''
                 this.inputArr[1] = true
-              }
                 break
             case 'photoNum':
               if(this.reg.photoNum.test(value.trim())){
@@ -221,10 +221,7 @@
       goToMyShop () {
         this.$router.push({name: 'MyShop'})
       },
-      getResult(value,empty) {
-          this.isEmpty = empty
-          console.log(value,empty,this.isEmpty)
-      }
+      getResult(value,empty) {}
     },
     mounted () {
       this.reg.userName = new RegExp(/^[A-Za-z0-9_-]{4,}$/) //字母 数字 下划线
@@ -264,5 +261,9 @@
   }
   .register-type {
     margin-bottom: 9rem;
+  }
+  footer{
+    height: 4.5rem;
+    line-height: 4.5rem;
   }
 </style>
