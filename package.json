@@ -12,6 +12,8 @@
     "test": "npm run e2e"
   },
   "dependencies": {
+    "axios": "^0.16.2",
+    "blueimp-md5": "^2.7.0",
     "mint-ui": "^2.2.7",
     "vue": "^2.2.2",
     "vue-file-upload": "^0.1.2",

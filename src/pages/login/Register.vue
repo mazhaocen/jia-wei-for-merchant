@@ -9,7 +9,7 @@
         <ul class=" register-input account cl">
           <li>
             <img src="../../assets/img/login/user.png" alt="">
-            <input  type="text" placeholder="账号 请输入4位以上字母,数字或下划线"
+            <input  type="text" placeholder="请输入用户帐号"
                     v-on:input="changeInput('userName',$event.target.value)"
                     v-on:blur="inputBlur('userName',$event.target.value)"
                     v-on:focus="inputFocus('userName')"
@@ -109,70 +109,70 @@
       changeInput(type,value){
           switch (type){
             case 'userName':
-                this.userNameMsg = ''
-              if(!value.trim()){this.userErrMsg = '输入不能为空'
-                this.inputArr[0] = false
+                this.userNameMsg = '';
+              if(!value.trim()){this.userErrMsg = '输入不能为空';
+                this.inputArr[0] = false;
                 return}
               if(this.reg.userName.test(value.trim())){
-                this.userErrMsg = ''
+                this.userErrMsg = '';
                 this.inputArr[0] = true
               }else{
-                this.userErrMsg = '请输入正确用户名称'
+                this.userErrMsg = '请输入正确用户名称';
                 this.inputArr[0] = false
               }
                 break;
             case 'password1':
-              if(!value.trim()){this.pwdErrMsg1 = '输入不能为空'
-                this.inputArr[1] = false
+              if(!value.trim()){this.pwdErrMsg1 = '输入不能为空';
+                this.inputArr[1] = false;
                 return}
               if(this.reg.password.test(value.trim())){
-                this.pwdErrMsg1 = ''
-                this.inputArr[1] = true
+                this.pwdErrMsg1 = '';
+                this.inputArr[1] = true;
 
                 if(this.password1 !==this.password2){
-                  this.pwdErrMsg2 = '请输相同密码'
+                  this.pwdErrMsg2 = '请输相同密码';
                   this.inputArr[2] = false
                 }else{
-                  this.pwdErrMsg2 = ''
-                  this.inputArr[2] = true
+                  this.pwdErrMsg2 = '';
+                  this.inputArr[2] = true;
                   this.Md5Pwd = md5(this.password1)
                 }
               }else{
-                this.inputArr[1] = false
+                this.inputArr[1] = false;
                 this.pwdErrMsg1 = '请输6位以上密码'
               }
                 break;
             case 'password2':
               if(this.password1 ===this.password2){
-                this.pwdErrMsg2 = ''
-                this.inputArr[2] = true
+                this.pwdErrMsg2 = '';
+                this.inputArr[2] = true;
                 this.Md5Pwd = md5(this.password2)
               }else{
-                this.pwdErrMsg2 = '请输相同密码'
+                this.pwdErrMsg2 = '请输相同密码';
                 this.inputArr[2] = false
               }
               break;
             case 'photoNum':
               if(this.reg.photoNum.test(value.trim())){
-                this.photoErrMsg = false
-                this.inputArr[3] = true
-                console.log(sessionStorage.getItem('photoNum'))
+                this.photoErrMsg = false;
+                this.inputArr[3] = true;
+                console.log(sessionStorage.getItem('photoNum'));
                 if(sessionStorage.getItem('photoNum')!==value.trim() && sessionStorage.getItem('photoNum')!==null){
                   this.codeErrMsg = '手机号码未验证'
                 }else{
                   this.codeErrMsg = ''
                 }
               }else{
-                this.photoErrMsg = true
+                this.photoErrMsg = true;
                 this.inputArr[3] = false
               }
               break;
             case 'msgCode':
               if(this.reg.msgCode.test(value.trim())){
-                this.codeErrMsg = ''
+                this.codeErrMsg = '';
                 this.inputArr[4] = true
               }else{
-                this.codeErrMsg = '请输入6位验证码'
+                this.codeErrMsg = '请输入6位验证码';
                 this.inputArr[4] = false
               }
               break
@@ -183,15 +183,15 @@
         switch (type){
           case 'userName':
 
-            if(!value.trim()){this.userErrMsg = '输入不能为空'
-              this.inputArr[0] = false
+            if(!value.trim()){this.userErrMsg = '输入不能为空';
+              this.inputArr[0] = false;
               return}
             if(this.reg.userName.test(value.trim())){
-              this.userErrMsg = ''
-              this.inputArr[0] = true
+              this.userErrMsg = '';
+              this.inputArr[0] = true;
               Indicator.open('加载中...');
               checkUserName (value).then( res => {
-                console.log(res.status)
+                console.log(res.status);
                 Indicator.close();
                 if(res.data.content){
                   this.userNameMsg = '用户名已经存在'
@@ -203,25 +203,25 @@
                 Indicator.close();
               })
             }else{
-              this.userErrMsg = '请输入正确用户名称'
+              this.userErrMsg = '请输入正确用户名称';
               this.inputArr[0] = false
             }
 
             break;
           case 'password1':
-            if(!value.trim()){this.pwdErrMsg1 = '输入不能为空'
+            if(!value.trim()){this.pwdErrMsg1 = '输入不能为空';
               this.inputArr[1] = false
               return}
             break;
           case 'password2':
             if(this.password1 !==this.password2){
-              this.pwdErrMsg2 = '请输相同密码'
+              this.pwdErrMsg2 = '请输相同密码';
               this.inputArr[2] = false
             }
             break;
           case 'msgCode':
             if(!this.reg.msgCode.test(value.trim())){
-              this.codeErrMsg = '请输入6位验证码'
+              this.codeErrMsg = '请输入6位验证码';
               this.inputArr[4] = false
             }
             break
@@ -254,7 +254,7 @@
               if(this.inputArr[i]){
                   num++
               }else{
-                this.goResult = false
+                this.goResult = false;
                 return
               }
           }
@@ -266,10 +266,10 @@
       }
     },
     mounted(){
-        this.reg.isEmpty = new RegExp(/^\s*$/)
-      this.reg.userName = new RegExp(/^[A-Za-z0-9_-]{4,}$/) //字母 数字 下划线
-      this.reg.password = new RegExp (/\S{6,}/) // 密码6个以上字符
-      this.reg.photoNum = new RegExp(/^1[3|4|5|7|8][0-9]{9}$/)// 手机号码验证
+        this.reg.isEmpty = new RegExp(/^\s*$/);
+      this.reg.userName = new RegExp(/^[A-Za-z0-9_-]{4,}$/); //字母 数字 下划线
+      this.reg.password = new RegExp (/\S{6,}/); // 密码6个以上字符
+      this.reg.photoNum = new RegExp(/^1[3|4|5|7|8][0-9]{9}$/);// 手机号码验证
       this.reg.msgCode = new RegExp(/^\d{6}$/)// 6个验证码
     },
     destroyed(){
