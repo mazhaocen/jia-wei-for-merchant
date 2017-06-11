@@ -35,9 +35,9 @@
                    v-on:input="changeInput('photoNum',$event.target.value)"
                    v-on:blur="inputBlur('photoNum',$event.target.value)"
                    v-model="photoNum">
-            <!--<p class="err-msg">{{photoNum}}</p>-->
-            <button v-show="photoErrMsg">获取验证码</button>
-            <el-get-code v-show="!photoErrMsg" :photoNum="photoNum" v-on:codeErr='codeErr'></el-get-code>
+            <p class="err-msg">{{photoErrMsg}}</p>
+            <!--<button v-show="photoErrMsg">获取验证码</button>-->
+            <el-get-code v-show="inputArr[3]" :photoNum="photoNum" v-on:codeErr='codeErr'></el-get-code>
           </li>
           <li>
             <img src="../../assets/img/login/msg.png" alt="">
@@ -60,7 +60,6 @@
         <p @click="goToLogin"><!--<span class="fl">注册</span>--><span class="">已有账号 登录</span></p>
       </div>
     </section>
-    <!--<footer @click="goToRegister">申请开店</footer>-->
   </div>
 </template>
 
@@ -85,7 +84,7 @@
         userErrMsg: '',
         pwdErrMsg1: '',
         pwdErrMsg2: '',
-        photoErrMsg: true,
+        photoErrMsg: '' ,
         codeErrMsg: '',
         reg: {},
         inputArr: [false, false, false, false, false],
@@ -109,21 +108,15 @@
               this.inputArr[0] = false;
               return
             }
-//            if (this.reg.userName.test(value.trim())) {
-//              this.userErrMsg = '';
-//              this.inputArr[0] = true
-//            } else {
-//              this.userErrMsg = '请输入正确用户名称';
-//              this.inputArr[0] = false
-//            }
             break;
           case 'password1':
+            this.pwdErrMsg1 = '';
             if (!value.trim()) {
               this.pwdErrMsg1 = '输入不能为空';
               this.inputArr[1] = false;
               return
             }
-            if (this.reg.password.test(value.trim())) {
+            if (this.reg.password.test(value)) {
               this.pwdErrMsg1 = '';
               this.inputArr[1] = true;
 
@@ -137,7 +130,7 @@
               }
             } else {
               this.inputArr[1] = false;
-              this.pwdErrMsg1 = '请输6位以上密码'
+//              this.pwdErrMsg1 = '请输6位以上密码'
             }
             break;
           case 'password2':
@@ -151,23 +144,34 @@
             }
             break;
           case 'photoNum':
+              this.photoErrMsg = '';
             if (this.reg.photoNum.test(value.trim())) {
-              this.photoErrMsg = false;
+              this.photoErrMsg = '';
               this.inputArr[3] = true;
               console.log(sessionStorage.getItem('photoNum'));
-              if (sessionStorage.getItem('photoNum') !== value.trim() && sessionStorage.getItem('photoNum') !== null) {
-                this.codeErrMsg = '手机号码未验证'
-              } else {
+              if (sessionStorage.getItem('photoNum') === value.trim()) {
                 this.codeErrMsg = ''
+              } else if(sessionStorage.getItem('photoNum') === null) {
+                this.codeErrMsg = ''
+              }else{
+                this.codeErrMsg = '手机号码未验证'
               }
             } else {
-              this.photoErrMsg = true;
               this.inputArr[3] = false
             }
             break;
           case 'msgCode':
             if (this.reg.msgCode.test(value.trim())) {
               this.codeErrMsg = '';
+              if (sessionStorage.getItem('photoNum') === value.trim()) {
+                this.codeErrMsg = ''
+              } else if(sessionStorage.getItem('photoNum') === null) {
+                this.codeErrMsg = ''
+                this.inputArr[3] = false
+              }else{
+                this.codeErrMsg = '手机号码未验证'
+                this.inputArr[3] = false
+              }
               this.inputArr[4] = true
             } else {
               this.codeErrMsg = '请输入6位验证码';
@@ -188,10 +192,11 @@
             this.userErrMsg = '';
             this.inputArr[0] = true;
             Indicator.open('加载中...');
-            checkUserName(value).then(res => {
+            checkUserName(value,'NAME').then(res => {
               Indicator.close();
               if (res.data.content) {
-                this.userNameMsg = '用户名已经存在'
+                this.userErrMsg = '用户名已经存在'
+                this.inputArr[0] = false;
               } else {
                 this.userNameMsg = "用户可用"
               }
@@ -199,13 +204,28 @@
               console.log(err);
               Indicator.close();
             })
-
             break;
           case 'password1':
             if (!value.trim()) {
               this.pwdErrMsg1 = '输入不能为空';
               this.inputArr[1] = false
               return
+            }
+            if (this.reg.password.test(value)) {
+              this.pwdErrMsg1 = '';
+              this.inputArr[1] = true;
+
+              if (this.password1 !== this.password2) {
+                this.pwdErrMsg2 = '请输相同密码';
+                this.inputArr[2] = false
+              } else {
+                this.pwdErrMsg2 = '';
+                this.inputArr[2] = true;
+                this.Md5Pwd = md5(this.password1)
+              }
+            } else {
+              this.inputArr[1] = false;
+              this.pwdErrMsg1 = '请输6位以上密码'
             }
             break;
           case 'password2':
@@ -214,6 +234,20 @@
               this.inputArr[2] = false
             }
             break;
+          case'photoNum':
+            if (!value.trim()) {
+              this.photoErrMsg = '手机号不能为空';
+              this.inputArr[3] = false;
+              return
+            }
+            if (this.reg.photoNum.test(value.trim())) {
+              this.photoErrMsg = '';
+              this.inputArr[3] = true;
+            } else {
+              this.photoErrMsg = '手机号码不存在';
+              this.inputArr[3] = false
+            }
+              break
           case 'msgCode':
             if (!this.reg.msgCode.test(value.trim())) {
               this.codeErrMsg = '请输入6位验证码';
@@ -255,8 +289,6 @@
         }
         if (num === this.inputArr.length) {
           this.goResult = true
-        } else {
-
         }
       }
     },
