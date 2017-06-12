@@ -222,13 +222,19 @@
           this.inputArr[3] = true;
           if (sessionStorage.getItem('photoNum') === value) {
             this.codeErrMsg = ''
-            if (!this.reg.msgCode.test(value.trim())) {
+            if (!this.reg.msgCode.test(this.msgCode)) {
               this.codeErrMsg = '请输入6位验证码'
+            }else{
+              this.codeErrMsg = ''
+
+              this.inputArr[4] = true
             }
           } else if(sessionStorage.getItem('photoNum') === null) {
             this.codeErrMsg = ''
+            this.inputArr[4] = false
           }else{
             this.codeErrMsg = '手机号码未验证'
+            this.inputArr[4] = false
           }
         } else {
           this.photoErrMsg = '手机号码有误';

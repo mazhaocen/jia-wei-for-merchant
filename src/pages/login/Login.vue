@@ -52,7 +52,8 @@
         </ul>
       </div>
       <div class="register-btn">
-        <button @click="goToMyShop" :style="{}" :disabled="!goResult" :class="{'disabled':!goResult}">登录</button>
+        <button v-if="loginType==='account'" @click="goToMyShop" :disabled="!goResultAcc" :class="{'disabled':!goResultAcc}">登录</button>
+        <button v-if="loginType==='tel'" @click="goToMyShop" :disabled="!goResultTel" :class="{'disabled':!goResultTel}">登录</button>
         <p @click="goToForgotPwd" v-if="loginType=='account'"><span class="">忘记密码</span></p>
       </div>
     </section>
@@ -82,7 +83,8 @@
         userNameMsg:'',
         inputArr:[false,false,false,false],
         reg:{},
-        goResult:false,
+        goResultAcc:false,
+        goResultTel:false,
         photoErr:'',
         Md5Pwd: ''
       }
@@ -173,12 +175,17 @@
           this.inputArr[2] = true
           if (sessionStorage.getItem('photoNum') === value) {
             this.codeErrMsg = ''
-            if (!this.reg.msgCode.test(value.trim())) {
+            if (!this.reg.msgCode.test(this.msgCode)) {
               this.codeErrMsg = '请输入6位验证码'
+            }else{
+              this.codeErrMsg = ''
+              this.inputArr[3] = true
             }
           } else if(sessionStorage.getItem('photoNum') === null) {
             this.codeErrMsg = ''
+            this.inputArr[3] = false
           }else{
+            this.inputArr[3] = false
             this.codeErrMsg = '手机号码未验证'
           }
         } else {
@@ -205,10 +212,15 @@
         })
       },
       pushRegister (){
-        if((this.inputArr[0] && this.inputArr[1]) || (this.inputArr[2] && this.inputArr[3]) ){
-          this.goResult = true
+        if((this.inputArr[0] && this.inputArr[1])){
+          this.goResultAcc = true
         }else{
-          this.goResult = false
+          this.goResultAcc = false
+        }
+        if(this.inputArr[2] && this.inputArr[3]){
+          this.goResultTel = true
+        }else{
+          this.goResultTel = false
         }
       },
       goToRegister () {
