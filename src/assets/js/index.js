@@ -20,23 +20,22 @@ window.onload = function () {
       name: 'keyback'
     }, function (ret) {
       if (ret) {
-        // var page_id = $('.page.in').attr('id');
-        // var  arr = ['index','cook','cook-live','shop-cart','me'];
-        // if(arr.indexOf(page_id)!=-1) {
-        //   if ((new Date().getTime() - mkeyTime) > 2000) {
-        //     mkeyTime = new Date().getTime();
-        //     api.toast({
-        //       msg: '再按一次退出程序',
-        //       duration: 2000,
-        //       location: 'bottom'
-        //     });
-        //   } else {
-        //     api.closeWidget();
-        //   }
-        // }else{
-          history.go(-1)
-        // }
 
+        var  arr = ['index'];
+        if(arr.indexOf(window.page)!=-1) {
+          if ((new Date().getTime() - mkeyTime) > 2000) {
+            mkeyTime = new Date().getTime();
+            api.toast({
+              msg: '再按一次退出程序',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            api.closeWidget();
+          }
+        }else{
+          history.go(-1)
+        }
       }
     });
   };

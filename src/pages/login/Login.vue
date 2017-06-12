@@ -160,13 +160,14 @@
               if(!value.trim()){this.userErrMsg = '输入不能为空'
                 this.inputArr[0] = false
                 return}
-              if(this.reg.userName.test(value.trim())){
+//              if(this.reg.userName.test(value.trim())){
                 this.userErrMsg = ''
                 Indicator.open('加载中...');
                 checkUserName (value).then( res => {
                   Indicator.close();
                   if(!res.data.content){
                     this.userErrMsg = '用户名不存在'
+                    this.inputArr[0] = false
                   }else{
                     this.inputArr[0] = true
                     this.userNameMsg=""
@@ -175,10 +176,10 @@
                   console.log(err.response);
                   Indicator.close();
                 })
-              }else{
-                this.userErrMsg = '用户名不存在'
-                this.inputArr[0] = false
-              }
+//              }else{
+//                this.userErrMsg = '用户名不存在'
+//                this.inputArr[0] = false
+//              }
                 break
             case 'password':
               if(!value.trim()){this.pwdErrMsg = '输入不能为空'

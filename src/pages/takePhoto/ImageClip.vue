@@ -76,14 +76,9 @@
           quality: 1
         }, (ret, err)=> {
           if (ret) {
-//            alert(JSON.stringify(ret));
-//            console.log(JSON.stringify(ret));
-//            sessionStorage.setItem('clipImageUrl',ret.albumPath)
             FNImageClip.close();
             this.$emit('clipImage',ret.destPath)
           } else {
-//            alert(JSON.stringify(err));
-//            console.log(JSON.stringify(err));
           }
         });
       },

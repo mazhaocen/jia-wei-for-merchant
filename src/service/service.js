@@ -43,12 +43,12 @@ let register = (userName,pwd,photo,msgCode) => { //提交注册
     }
   })
 }
-let uploadImg = (sourceId,type,flies) => { //图片上传
+let uploadImg = (sourceId,type,name,flies) => { //图片上传
   return axios({
     method:'POST',
-    url: url+'/parameter-component/file/source/'+sourceId+'/type/'+type,
+    url: url+'/parameter-component/file/source/'+sourceId+'/type/'+type+'/name/'+name+'/base64',
     data: {
-      flies:flies
+      fileStr:flies
     }
   })
 }

@@ -40,7 +40,7 @@
 </template>
 
 <script>
-  import { Actionsheet } from 'mint-ui';
+  import { Actionsheet,Indicator } from 'mint-ui';
   import ImageClip from '@/pages/takePhoto/ImageClip'
   import Header from '@/components/Head'
   import {uploadImg} from '@/service/service'
@@ -118,14 +118,18 @@
           canvas.height = height ? height : img.height;
           canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
           this.base64Url = canvas.toDataURL()
-          this.uploadImg(111,'up',this.base64Url)
+          let name = new Date().getTime()+'.png'
+          Indicator.open('上传中...');
+          this.uploadImg(111111,'ID_CARD_FROND',name,this.base64Url)
         }
       },
-      uploadImg(id,type){
-          uploadImg(id,type,this.files).then(res=>{
+      uploadImg(id,type,name,files){
+          uploadImg(id,type,name,files).then(res=>{
             console.log(res)
+            Indicator.close();
           }).catch(err=>{
             console.log(err.response);
+            Indicator.close();
           })
       }
     },

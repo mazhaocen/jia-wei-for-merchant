@@ -20,7 +20,7 @@
       return {}
     },
     created(){
-
+      window.page = 'index'
     },
     methods: {
       goToLogin () {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="745c37e1-c42e-459d-934e-69c05994391b" name="https://github.com/mazhaocen/jia-wei-for-merchant.git" url="https://github.com/mazhaocen/jia-wei-for-merchant.git">
+        <fileTransfer host="https://github.com/mazhaocen/jia-wei-for-merchant.git" port="21" rootFolder="https://github.com/mazhaocen/jia-wei-for-merchant.git">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
