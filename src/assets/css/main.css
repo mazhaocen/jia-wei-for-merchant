@@ -190,6 +190,7 @@ ul.mint-actionsheet-list>li{
   width:100%;
   line-height: 3.611rem;
   font-size: 1.333rem;
+  z-index: 600;
 }
 .register header{
   top:0;

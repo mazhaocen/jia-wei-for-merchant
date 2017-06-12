@@ -196,7 +196,7 @@
         if (this.password1 === this.password2) {
           this.pwdErrMsg2 = '';
           this.inputArr[2] = true;
-          if(this.reg.password.test(value)){
+          if(this.reg.password.test(this.password2)){
             this.Md5Pwd = md5(this.password2)
           }
         } else {
