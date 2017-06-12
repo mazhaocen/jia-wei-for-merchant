@@ -37,8 +37,6 @@
                         v-on:input="changeInput('photoNum',$event.target.value)"
                         v-on:blur="inputBlur('photoNum',$event.target.value)"
                         v-model="photoNum">
-                <!--<p class="err-msg">{{photoNum}}</p>-->
-                <!--<button v-show="photoErrMsg">获取验证码</button>-->
                 <p class="err-msg" v-show="photoErrMsg">{{photoErr}}</p>
                 <el-get-code v-show="!photoErrMsg" :photoNum="photoNum" v-on:codeErr = 'codeErr'></el-get-code>
               </li>
@@ -85,15 +83,14 @@
         inputArr:[false,false,false,false],
         reg:{},
         goResult:false,
-        photoErr:''
+        photoErr:'',
+        Md5Pwd: ''
       }
     },
     components:{
         'el-get-code':GetCode,
-//      'el-input':Input
     },
     created(){
-
     },
     methods: {
       registerType (type) {
@@ -102,53 +99,38 @@
       changeInput (type,value) {
           switch (type){
             case 'userName':
-              if(!value.trim()){
-                this.userErrMsg = '输入不能为空'
-                this.inputArr[0] = false
-                return
-              }
-                this.userErrMsg = ''
-                break
+              this.userErrMsg = ''
+             if(this.nullVerify(value.trim(),0,'userErrMsg')) {
+                 return
+             }
+             break
             case 'password':
-              if(!value.trim()){
-                this.pwdErrMsg = '输入不能为空'
-                this.inputArr[1] = false
+              if(this.nullVerify(value.trim(),1,'pwdErrMsg')){
                 return
               }
                 this.pwdErrMsg = ''
                 this.inputArr[1] = true
+                this.Md5Pwd = md5(this.password)
                 break
             case 'photoNum':
-              if(this.reg.photoNum.test(value.trim())){
-                this.photoErrMsg = false
-                console.log(sessionStorage.getItem('photoNum'))
-                if(sessionStorage.getItem('photoNum')!==value.trim() && sessionStorage.getItem('photoNum')!==null){
-                  this.codeErrMsg = '手机号码未验证'
-                  this.inputArr[2] = false
-                }else{
-                  this.codeErrMsg = ''
-                  this.inputArr[2] = true
-                }
-              }else{
-                this.photoErrMsg = true
-                this.inputArr[2] = false
-              }
+              this.photoVerify(value.trim())
               break;
             case 'msgCode':
-              console.log(sessionStorage.getItem('photoNum'))
-              if(sessionStorage.getItem('photoNum')!==this.photoNum && sessionStorage.getItem('photoNum')!==null){
-                this.codeErrMsg = '手机号码未验证'
-                this.inputArr[2] = false
-                return
-              }else{
-                this.inputArr[2] = true
-                if(this.reg.msgCode.test(value.trim())){
+              if (this.reg.msgCode.test(value.trim())) {
+                this.codeErrMsg = '';
+                if (sessionStorage.getItem('photoNum') === this.photoNum) {
                   this.codeErrMsg = ''
                   this.inputArr[3] = true
+                } else if(sessionStorage.getItem('photoNum') === null) {
+                  this.codeErrMsg = '手机号码未验证'
+                  this.inputArr[3] = false
                 }else{
-                  this.codeErrMsg = '请输入6位验证码'
+                  this.codeErrMsg = '手机号码未验证'
                   this.inputArr[3] = false
                 }
+              } else {
+                this.codeErrMsg = '请输入6位验证码';
+                this.inputArr[3] = false
               }
               break
           }
@@ -157,46 +139,21 @@
       inputBlur (type,value) {
           switch (type) {
             case 'userName':
-              if(!value.trim()){this.userErrMsg = '输入不能为空'
-                this.inputArr[0] = false
-                return}
-//              if(this.reg.userName.test(value.trim())){
-                this.userErrMsg = ''
-                Indicator.open('加载中...');
-                checkUserName (value).then( res => {
-                  Indicator.close();
-                  if(!res.data.content){
-                    this.userErrMsg = '用户名不存在'
-                    this.inputArr[0] = false
-                  }else{
-                    this.inputArr[0] = true
-                    this.userNameMsg=""
-                  }
-                }).catch(err=>{
-                  console.log(err.response);
-                  Indicator.close();
-                })
-//              }else{
-//                this.userErrMsg = '用户名不存在'
-//                this.inputArr[0] = false
-//              }
-                break
+              if(this.nullVerify(value.trim(),0,'userErrMsg')){
+                  return
+              }
+              this.userErrMsg = ''
+              this.checkUser(value.trim())
+              break
             case 'password':
-              if(!value.trim()){this.pwdErrMsg = '输入不能为空'
-                this.inputArr[1] = false
-                return}else{
-                this.inputArr[1] = true
+              if(this.nullVerify(value.trim(),1,'pwdErrMsg')){
+                  return
               }
-              this.Md5Pwd = md5(this.password)
-              console.log(this.password,this.Md5Pwd)
-                break
+              this.inputArr[1] = true
+              break
             case'photoNum':
-              if(this.reg.photoNum.test(value.trim())){
-                this.photoErr = ''
-              }else{
-                  this.photoErr = '号码有误'
-              }
-                break
+              this.photoVerify(value.trim())
+              break
           }
         this.pushRegister()
       },
@@ -206,8 +163,49 @@
       codeErr (value) {
         this.codeErrMsg = value
       },
+      nullVerify (value,num,type) {
+        if (!value) {this[type] = '输入不能为空';this.inputArr[num] = false;this.pushRegister();return true}
+      },
+      photoVerify(value){
+        if (this.reg.photoNum.test(value)) {
+          this.photoErr = ''
+          this.photoErrMsg = false
+          this.inputArr[2] = true
+          if (sessionStorage.getItem('photoNum') === value) {
+            this.codeErrMsg = ''
+            if (!this.reg.msgCode.test(value.trim())) {
+              this.codeErrMsg = '请输入6位验证码'
+            }
+          } else if(sessionStorage.getItem('photoNum') === null) {
+            this.codeErrMsg = ''
+          }else{
+            this.codeErrMsg = '手机号码未验证'
+          }
+        } else {
+          this.photoErrMsg = true
+          this.photoErr = '手机号码有误';
+          this.inputArr[2] = false
+        }
+      },
+      checkUser (value) {
+        Indicator.open('加载中...');
+        checkUserName(value,'NAME').then(res => {
+          Indicator.close();
+          if (res.data.content) {
+            this.userNameMsg = ''
+            this.inputArr[0] = true;
+            this.pushRegister()
+          } else {
+            this.userErrMsg = "用户不存在"
+            this.inputArr[0] = false;
+          }
+        }).catch(err => {
+          console.log(err.response);
+          Indicator.close();
+        })
+      },
       pushRegister (){
-        if((this.inputArr[0] && this.inputArr[1]) ||(this.inputArr[2] && this.inputArr[3]) ){
+        if((this.inputArr[0] && this.inputArr[1]) || (this.inputArr[2] && this.inputArr[3]) ){
           this.goResult = true
         }else{
           this.goResult = false
@@ -225,10 +223,11 @@
       getResult(value,empty) {}
     },
     mounted () {
-      this.reg.userName = new RegExp(/^[A-Za-z0-9_-]{4,}$/) //字母 数字 下划线
       this.reg.photoNum = new RegExp(/^1[3|4|5|7|8][0-9]{9}$/)// 手机号码验证
       this.reg.msgCode = new RegExp(/^\d{6}$/)// 6个验证码
-
+    },
+    destroyed () {
+      sessionStorage.removeItem('photoNum')
     }
   }
 </script>

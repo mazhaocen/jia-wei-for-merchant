@@ -6,32 +6,38 @@
         <div class="head_img"><img src="../../assets/img/me/me-head.png" alt=""></div>
         <div class="head_text">
           <h4>客家厨子</h4>
-          <p>店铺号:123456</p>
-          <a @click="goToUserManage">账户管理</a>
+          <p v-if="false">店铺号:123456</p>
+          <a @click="goToUserManage" v-if="false">账户管理</a>
         </div>
       </div>
-      <ul class="today-data cl">
-        <li @click="goToBalanceMoney">
-          <span>今日成交总额</span>
-          <p>￥234</p>
-        </li>
-        <li>
-        <span>今日访客</span>
-        <p>34</p>
-      </li>
-        <li>
-        <span>今日订单</span>
-        <p>14</p>
-      </li>
-      </ul>
-      <ul class="order-list">
-        <li @click="goToAddGoods"><div></div><p>发布商品</p></li>
-        <li @click="goToGoodsManage"><div></div><p>商品管理</p></li>
-        <li @click="goToOrderManage"><div></div><p>订单管理</p></li>
-        <li class="bd-t"><div></div><p>新手必备</p></li>
-        <li class="bd-t"><div></div><p>催单</p></li>
-        <li class="bd-t"><div></div><p>客服</p></li>
-      </ul>
+      <div v-if="false">
+        <ul class="today-data cl">
+          <li @click="goToBalanceMoney">
+            <span>今日成交总额</span>
+            <p>￥234</p>
+          </li>
+          <li>
+            <span>今日访客</span>
+            <p>34</p>
+          </li>
+          <li>
+            <span>今日订单</span>
+            <p>14</p>
+          </li>
+        </ul>
+        <ul class="order-list">
+          <li @click="goToAddGoods"><div></div><p>发布商品</p></li>
+          <li @click="goToGoodsManage"><div></div><p>商品管理</p></li>
+          <li @click="goToOrderManage"><div></div><p>订单管理</p></li>
+          <li class="bd-t"><div></div><p>新手必备</p></li>
+          <li class="bd-t"><div></div><p>催单</p></li>
+          <li class="bd-t"><div></div><p>客服</p></li>
+        </ul>
+      </div>
+      <div v-if="true" class="open-button">
+        <button @click="goToNewShop">申请开店</button>
+      </div>
+
     </section>
     <!--<el-footer :choose=5></el-footer>-->
   </div>
@@ -70,12 +76,28 @@ export default {
     },
     goToBalanceMoney () {
       this.$router.push({name:'BalanceMoney'})
+    },
+    goToNewShop () {
+      this.$router.push({name: 'NewShop'})
     }
   }
 }
 </script>
 
 <style scoped>
+  .open-button>button{
+    width: 14rem;
+    height: 4rem;
+    margin-top: 5rem;
+    background-color: #dddddd;
+    color: #008842;
+    font-size: 1.3rem;
+    border-radius: 3px;
+    border:1px solid #008842;
+  }
+  .open-button{
+    text-align: center;
+  }
   .bd-t{
     border-top:1px solid #efefef;
   }

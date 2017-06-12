@@ -56,7 +56,7 @@
       </div>
       <div class="register-btn">
         <!--<button @click="goToNewShop" :disabled="!goResult" :class="{disabled:!goResult}">注册</button>-->
-        <button @click="goToNewShop">注册</button>
+        <button @click="register">注册</button>
         <p @click="goToLogin"><!--<span class="fl">注册</span>--><span class="">已有账号 登录</span></p>
       </div>
     </section>
@@ -103,62 +103,25 @@
           case 'userName':
             this.userNameMsg = '';
             this.userErrMsg = '';
-            if (!value.trim()) {
-              this.userErrMsg = '输入不能为空';
-              this.inputArr[0] = false;
-              return
-            }
+            this.nullVerify(value.trim(),0,'userErrMsg')
             break;
           case 'password1':
             this.pwdErrMsg1 = '';
-            if (!value.trim()) {
-              this.pwdErrMsg1 = '输入不能为空';
-              this.inputArr[1] = false;
-              return
+            if(this.nullVerify(value.trim(),1,'pwdErrMsg1')){
+                return
             }
             if (this.reg.password.test(value)) {
-              this.pwdErrMsg1 = '';
-              this.inputArr[1] = true;
-
-              if (this.password1 !== this.password2) {
-                this.pwdErrMsg2 = '请输相同密码';
-                this.inputArr[2] = false
-              } else {
-                this.pwdErrMsg2 = '';
-                this.inputArr[2] = true;
-                this.Md5Pwd = md5(this.password1)
-              }
+              this.pwdVerify()
             } else {
               this.inputArr[1] = false;
-//              this.pwdErrMsg1 = '请输6位以上密码'
             }
             break;
           case 'password2':
-            if (this.password1 === this.password2) {
-              this.pwdErrMsg2 = '';
-              this.inputArr[2] = true;
-              this.Md5Pwd = md5(this.password2)
-            } else {
-              this.pwdErrMsg2 = '请输相同密码';
-              this.inputArr[2] = false
-            }
+            this.pwd2Verify()
             break;
           case 'photoNum':
-              this.photoErrMsg = '';
-            if (this.reg.photoNum.test(value.trim())) {
-              this.photoErrMsg = '';
-              this.inputArr[3] = true;
-              console.log(sessionStorage.getItem('photoNum'));
-              if (sessionStorage.getItem('photoNum') === value.trim()) {
-                this.codeErrMsg = ''
-              } else if(sessionStorage.getItem('photoNum') === null) {
-                this.codeErrMsg = ''
-              }else{
-                this.codeErrMsg = '手机号码未验证'
-              }
-            } else {
-              this.inputArr[3] = false
-            }
+            this.photoErrMsg = '';
+            this.photoVerify(value.trim())
             break;
           case 'msgCode':
             if (this.reg.msgCode.test(value.trim())) {
@@ -184,70 +147,33 @@
       inputBlur(type, value){
         switch (type) {
           case 'userName':
-            if (!value.trim()) {
-              this.userErrMsg = '输入不能为空';
-              this.inputArr[0] = false;
-              return
+            if(this.nullVerify(value.trim(),0,'userErrMsg')){
+                return
             }
             this.userErrMsg = '';
             this.inputArr[0] = true;
-            Indicator.open('加载中...');
-            checkUserName(value,'NAME').then(res => {
-              Indicator.close();
-              if (res.data.content) {
-                this.userErrMsg = '用户名已经存在'
-                this.inputArr[0] = false;
-              } else {
-                this.userNameMsg = "用户可用"
-              }
-            }).catch(err => {
-              console.log(err);
-              Indicator.close();
-            })
+            this.checkUser(value.trim())
             break;
           case 'password1':
-            if (!value.trim()) {
-              this.pwdErrMsg1 = '输入不能为空';
-              this.inputArr[1] = false
-              return
+            if(this.nullVerify(value.trim(),1,'pwdErrMsg1')){
+                return
             }
             if (this.reg.password.test(value)) {
-              this.pwdErrMsg1 = '';
-              this.inputArr[1] = true;
-
-              if (this.password1 !== this.password2) {
-                this.pwdErrMsg2 = '请输相同密码';
-                this.inputArr[2] = false
-              } else {
-                this.pwdErrMsg2 = '';
-                this.inputArr[2] = true;
-                this.Md5Pwd = md5(this.password1)
-              }
+              this.pwdVerify()
             } else {
               this.inputArr[1] = false;
               this.pwdErrMsg1 = '请输6位以上密码'
             }
             break;
           case 'password2':
-            if (this.password1 !== this.password2) {
-              this.pwdErrMsg2 = '请输相同密码';
-              this.inputArr[2] = false
-            }
+            this.pwd2Verify()
             break;
           case'photoNum':
-            if (!value.trim()) {
-              this.photoErrMsg = '手机号不能为空';
-              this.inputArr[3] = false;
-              return
+            if(this.nullVerify(value.trim(),3,'photoErrMsg')){
+                return
             }
-            if (this.reg.photoNum.test(value.trim())) {
-              this.photoErrMsg = '';
-              this.inputArr[3] = true;
-            } else {
-              this.photoErrMsg = '手机号码不存在';
-              this.inputArr[3] = false
-            }
-              break
+            this.photoVerify(value.trim())
+            break
           case 'msgCode':
             if (!this.reg.msgCode.test(value.trim())) {
               this.codeErrMsg = '请输入6位验证码';
@@ -257,22 +183,86 @@
         }
         this.pushRegister()
       },
-      inputFocus(type){
+      inputFocus(type){},
+      nullVerify (value,num,type) {
+        if (!value) {
+            this[type] = '输入不能为空'
+            this.inputArr[num] = false
+          this.pushRegister()
+            return true
+        }
+      },
+      pwd2Verify () {
+        if (this.password1 === this.password2) {
+          this.pwdErrMsg2 = '';
+          this.inputArr[2] = true;
+          if(this.reg.password.test(value)){
+            this.Md5Pwd = md5(this.password2)
+          }
+        } else {
+          this.pwdErrMsg2 = '请输相同密码';
+          this.inputArr[2] = false
+        }
+      },
+      pwdVerify () {
+        this.pwdErrMsg1 = '';
+        this.inputArr[1] = true;
+        if (this.password1 !== this.password2) {
+          this.pwdErrMsg2 = '请输相同密码';
+          this.inputArr[2] = false
+        } else {
+          this.pwdErrMsg2 = '';
+          this.inputArr[2] = true;
+          this.Md5Pwd = md5(this.password1)
+        }
+      },
+      photoVerify (value) {
+        if (this.reg.photoNum.test(value)) {
+          this.photoErrMsg = '';
+          this.inputArr[3] = true;
+          if (sessionStorage.getItem('photoNum') === value) {
+            this.codeErrMsg = ''
+            if (!this.reg.msgCode.test(value.trim())) {
+              this.codeErrMsg = '请输入6位验证码'
+            }
+          } else if(sessionStorage.getItem('photoNum') === null) {
+            this.codeErrMsg = ''
+          }else{
+            this.codeErrMsg = '手机号码未验证'
+          }
+        } else {
+          this.photoErrMsg = '手机号码有误';
+          this.inputArr[3] = false
+        }
+      },
+      checkUser (value) {
+        Indicator.open('加载中...');
+        checkUserName(value,'NAME').then(res => {
+          Indicator.close();
+          if (res.data.content) {
+            this.userErrMsg = '用户名已经存在'
+            this.inputArr[0] = false;
+          } else {
+            this.userNameMsg = "用户可用"
+          }
+        }).catch(err => {
+          console.log(err.response);
+          Indicator.close();
+        })
       },
       goToLogin () {
         this.$router.push({name: 'Login'})
       },
-      goToNewShop () { //点击注册
-//        Indicator.open('加载中...');
-//        register(this.userName,this.Md5Pwd,this.photoNum,this.msgCode).then(res=>{
-//          console.log(res)
-//          Indicator.close();
-        this.$router.push({name: 'NewShop'})
-//        }).catch(err=>{
-//          console.log(err)
-//          Indicator.close();
-//        })
-
+      register () { //点击注册
+        Indicator.open('加载中...');
+        register(this.userName,this.Md5Pwd,this.photoNum,this.msgCode).then(res=>{
+          console.log(res)
+          Indicator.close();
+          this.$router.push({name: 'MyShop'})
+        }).catch(err=>{
+          console.log(err.response)
+          Indicator.close();
+        })
       },
       codeErr(value){
         this.codeErrMsg = value
@@ -299,7 +289,7 @@
       this.reg.photoNum = new RegExp(/^1[3|4|5|7|8][0-9]{9}$/);// 手机号码验证
       this.reg.msgCode = new RegExp(/^\d{6}$/)// 6个验证码
     },
-    destroyed(){
+    destroyed () {
       sessionStorage.removeItem('photoNum')
     }
   }

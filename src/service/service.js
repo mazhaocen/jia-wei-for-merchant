@@ -30,6 +30,19 @@ let verifyPhoto = (photoNum) =>{
     url: url+'/user-component/verify/'+photoNum
   })
 }
+let userRealInfo = (idCard,idCardFront,idCardBack,name,phoneNumber) => {
+  return axios({
+    method:'POST',
+    url: url+'/user-component/user',
+    data: {
+      login: userName,
+      loginType: "Name",
+      password: pwd,
+      phone: photo,
+      // msgCode:msgCode
+    }
+  })
+}
 let register = (userName,pwd,photo,msgCode) => { //提交注册
   return axios({
     method:'POST',

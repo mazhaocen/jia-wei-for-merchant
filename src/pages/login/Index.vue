@@ -6,8 +6,8 @@
       <span>让近邻用户选择您的店铺</span>
     </div>
     <div class="login-btn">
-      <button @touchend="goToLogin">用户登录</button>
-      <button @touchend="goToRegister">没有账号 需要注册</button>
+      <button @click="goToLogin">用户登录</button>
+      <button @click="goToRegister">没有账号 需要注册</button>
     </div>
   </div>
 </template>
