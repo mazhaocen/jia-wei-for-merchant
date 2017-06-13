@@ -64,7 +64,6 @@
 <script>
   import GetCode from '@/components/GetCode'
   import md5 from 'blueimp-md5'
-  //  import Input from '@/components/Input'
   import { Indicator } from 'mint-ui';
   import {checkUserName} from '@/service/service'
   export default {

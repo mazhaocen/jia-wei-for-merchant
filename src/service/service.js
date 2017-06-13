@@ -20,7 +20,7 @@ let getGoodsManageList = () => {
 let checkUserName = (loginName) => {
   return axios({
     method: "GET",
-    url: url+'/user-component/user/'+loginName+'/login-type/NAME'
+    url: url+'service-api/user/'+loginName
   })
 }
 // 获取手机验证码
@@ -43,16 +43,17 @@ let userRealInfo = (idCard,idCardFront,idCardBack,name,phoneNumber) => {
     }
   })
 }
-let register = (userName,pwd,photo,msgCode) => { //提交注册
+let register = (userName,pwd,photo,msgCode,staffId) => { //提交注册
   return axios({
     method:'POST',
-    url: url+'/user-component/user',
+    url: url+'/service-api/user',
     data: {
       login: userName,
-      loginType: "Name",
+      loginType: "string",
       password: pwd,
       phone: photo,
-      // msgCode:msgCode
+      referee: staffId,
+      verifyCode: msgCode
     }
   })
 }
