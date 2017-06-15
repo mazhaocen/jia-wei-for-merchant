@@ -37,7 +37,7 @@
                    v-model="photoNum">
             <p class="err-msg">{{photoErrMsg}}</p>
             <!--<button v-show="photoErrMsg">获取验证码</button>-->
-            <el-get-code v-show="inputArr[3]" :photoNum="photoNum" v-on:codeErr='codeErr'></el-get-code>
+            <el-get-code v-show="inputArr[3]" :photoNum="photoNum" type="register" v-on:codeErr='codeErr'></el-get-code>
           </li>
           <li>
             <img src="../../assets/img/login/msg.png" alt="">
@@ -242,17 +242,20 @@
         }
       },
       checkUser (value) {
+          console.log(123)
         Indicator.open('加载中...');
-        checkUserName(value,'NAME').then(res => {
+        checkUserName(value).then(res => {
+          console.log(res)
           Indicator.close();
           if (res.data.content) {
+
             this.userErrMsg = '用户名已经存在'
             this.inputArr[0] = false;
           } else {
             this.userNameMsg = "用户可用"
           }
         }).catch(err => {
-          console.log(err.response);
+          console.log(err);
           Indicator.close();
         })
       },

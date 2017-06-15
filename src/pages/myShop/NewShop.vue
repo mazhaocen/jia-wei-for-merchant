@@ -4,9 +4,23 @@
     <section class="content" style="background-color: #efefef">
       <p class="pd-1 open-title">请填写本人实名信息，如非本人实名将无法提现</p>
       <ul class="cl open-option">
-        <li>真实姓名 <input type="text" placeholder="请输入您的真实姓名"></li>
-        <li>联系电话 <input type="tel" placeholder="请输入您的联系电话"></li>
-        <li>身份证号 <input type="text" placeholder="请输入您的身份证号码"></li>
+        <li>真实姓名 <input type="text" :maxlength="10" placeholder="请输入您的真实姓名" v-model="realName"
+                        v-on:input ="inputChange('name',$event.target.value)"
+                        v-on:blur ="inputBlur('name',$event.target.value)"
+                        v-on:focus ="inputFocus('name',$event.target.value)">
+                        <p class="err-msg">{{realNameErrMsg}}</p>
+        </li>
+        <li>联系电话 <input type="tel" :maxlength="11" placeholder="请输入您的联系电话" v-model="phone"
+                        v-on:input ="inputChange('tel',$event.target.value)"
+                        v-on:blur ="inputBlur('tel',$event.target.value)"
+                        v-on:focus ="inputFocus('tel',$event.target.value)">
+                        <p class="err-msg">{{phoneErrMsg}}</p>
+        </li>
+        <li>身份证号 <input type="text" :maxlength="18" placeholder="请输入您的身份证号码" v-model="idCardNo"
+                        v-on:input ="inputChange('idCard',$event.target.value)"
+                        v-on:blur ="inputBlur('idCard',$event.target.value)"
+                        v-on:focus ="inputFocus('idCard',$event.target.value)">
+                        <p class="err-msg">{{idCardNoErrMsg}}</p></li>
       </ul>
       <div class="upload-pic pd-1">
         <p>申请人照片 </p>
@@ -17,9 +31,9 @@
             </div>
             <p>手持正面身份证</p>
           </div>
-          <div class="fr" @click="choosePhoto('reverse')">
+          <div class="fr" @click="choosePhoto('back')">
             <div class="back">
-              <img :src="base64Url" alt="">
+              <img :src="backImgUrl" alt="">
             </div>
             <p>手持背面身份证</p>
           </div>
@@ -27,12 +41,12 @@
       </div>
       <div class="open-type-choose pd-1">
         <p>商家类型（单选，选择后不能更改）</p>
-        <button :class="{select:type==1}" @click="merchantType(1)" class="fl">农家自产</button>
-        <button :class="{select:type==2}" @click="merchantType(2)" class="fr">新鲜商铺</button>
+        <button :class="{select:merchantType==='A'}" @click="chooseMerchantType('A')" class="fl">农家自产</button>
+        <button :class="{select:merchantType==='B'}" @click="chooseMerchantType('B')" class="fr">新鲜商铺</button>
       </div>
     </section>
     <footer>
-      <button class="save-btn" @click="">提交</button>
+      <button class="save-btn" @click="openShop">提交</button>
     </footer>
     <mt-actionsheet :actions="actions" v-model="sheetVisible"></mt-actionsheet>
     <image-clip class="the-top" v-if="imageClip" :imgUrl="imgUrl" v-on:clipImage = 'resultImage' :ratio="0.654"></image-clip>
@@ -43,20 +57,29 @@
   import { Actionsheet,Indicator } from 'mint-ui';
   import ImageClip from '@/pages/takePhoto/ImageClip'
   import Header from '@/components/Head'
-  import {uploadImg} from '@/service/service'
+  import {uploadImg, openShop} from '@/service/service'
   export default {
     name: 'newShop',
     data () {
       return {
-        type:1,
         sheetVisible:false,
         actions:[],
         imgUrl:'',
-        choose:'',
         upImgUrl:'',
         backImgUrl:'',
         imageClip:false,
-        base64Url:''
+        realName: "",
+        phone: "",
+        idCardNo: "",
+        idCardFront: "",
+        idCardBack: "",
+        merchantType: "A",
+        userId: "f2f41aed-3bd9-420c-93e8-7836a4aa0eab",
+        idCardType:"",
+        reg:{},
+        realNameErrMsg:'',
+        phoneErrMsg:'',
+        idCardNoErrMsg:''
       }
     },
     created(){
@@ -67,8 +90,62 @@
       'image-clip':ImageClip
     },
     methods: {
-      merchantType(type) {
-        this.type=type
+      inputChange (type,value) {
+        switch (type){
+          case 'name':
+            break
+          case 'tel':
+            break
+          case 'idCard':
+            if(this.reg.idCard.test(value)){
+              console.log(value)
+            }
+            break
+        }
+      },
+      inputBlur(type,value){
+        switch (type){
+          case 'name':
+              if(this.reg.name.test(this.realName.trim())){
+                this.realNameErrMsg = ''
+                return true
+              }else{
+                  this.realNameErrMsg = '姓名有误'
+                return false
+              }
+            break
+          case 'tel':
+            if(this.reg.tel.test(this.phone.trim())){
+              this.phoneErrMsg = ''
+              return true
+            }else{
+                this.phoneErrMsg = '手机号码有误'
+              return false
+            }
+            break
+          case 'idCard':
+            if(this.reg.idCard.test(this.idCardNo.trim())){
+              this.idCardNoErrMsg = ''
+              return true
+            }else{
+                this.idCardNoErrMsg = '身份证号码有误'
+              return false
+            }
+            break
+        }
+      },
+      inputFocus (type,value) {
+        switch (type){
+          case 'name':
+            break
+          case 'tel':
+            break
+          case 'idCard':
+            break
+        }
+      },
+      chooseMerchantType(type) {
+        this.merchantType=type
       },
       getPic(){
         this.getPhoto('album')
@@ -90,20 +167,18 @@
                 this.imgUrl = ret.data
                 this.imageClip = true
               }
-//            console.log(JSON.stringify(ret));
           } else {
-//            console.log(JSON.stringify(err));
           }
         });
       },
       choosePhoto(type){
         this.sheetVisible = true
-        this.choose = type  //正面 front  反面reverse
+        this.idCardType = type  //正面 front  反面back
       },
       resultImage(url){
         this.getBase64Image(url)
         this.imageClip = false
-        if(this.choose==='front'){
+        if(this.idCardType==='front'){
                this.upImgUrl = url
             }else{
               this.backImgUrl = url
@@ -117,20 +192,44 @@
           canvas.width = width ? width : img.width;
           canvas.height = height ? height : img.height;
           canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-          this.base64Url = canvas.toDataURL()
-          let name = new Date().getTime()+'.png'
-          Indicator.open('上传中...');
-          this.uploadImg(111111,'ID_CARD_FROND',name,this.base64Url)
+          console.log(this.idCardType);
+          if(this.idCardType ==='front'){
+            this.idCardFront = canvas.toDataURL()
+          }else{
+            this.idCardBack = canvas.toDataURL()
+          }
+//          let name = new Date().getTime()+'.png'
+//
+//          this.uploadImg(111111,'ID_CARD_FROND',name,this.base64Url)
         }
       },
-      uploadImg(id,type,name,files){
-          uploadImg(id,type,name,files).then(res=>{
-            console.log(res)
-            Indicator.close();
-          }).catch(err=>{
-            console.log(err.response);
-            Indicator.close();
-          })
+      openShop () {
+//        console.log('realName:',this.realName)
+//        console.log('phone:',this.phone)
+//        console.log('idCardNo:',this.idCardNo)
+//        console.log('idCardFront:',this.idCardFront)
+//        console.log('idCardBack:',this.idCardBack)
+//        console.log('merchantType:',this.merchantType)
+//        console.log('userId:',this.userId)
+        let arr = ['name','tel','idCard']
+        for (let i = 0;i<arr.length;i++){
+          if(!this.inputBlur(arr[i])){
+              console.log('cuole')
+            return
+          }
+        }
+        if(!this.idCardFront || !this.idCardBack){
+            alert('请上传证件照')
+            return
+        }
+        Indicator.open('上传中...');
+//        openShop(this.realName,this.phone,this.idCardNo,this.idCardFront,this.idCardBack,this.merchantType,this.userId).then(res=>{
+//          console.log(res);
+//          Indicator.close();
+//        }).catch(err=>{
+//            console.log(err)
+//          Indicator.close();
+//        })
       }
     },
     mounted () {
@@ -141,6 +240,9 @@
         name: '在相册中选择',
         method: this.getPic
       }]
+      this.reg.tel = new RegExp(/^1[3|4|5|7|8][0-9]{9}$/);// 手机号码验证
+      this.reg.name = new RegExp(/^[\u4E00-\u9FA5A-Za-z]+$/) //用户姓名
+      this.reg.idCard=new RegExp(/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/)
     }
   }
 </script>
@@ -204,6 +306,7 @@
     padding-left: 1rem;
   }
   .open-option>li{
+    position: relative;
     float: none;
     width: 100%;
     line-height: 4rem;

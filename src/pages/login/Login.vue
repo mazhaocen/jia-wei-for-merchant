@@ -38,7 +38,7 @@
                         v-on:blur="inputBlur('photoNum',$event.target.value)"
                         v-model="photoNum">
                 <p class="err-msg" v-show="photoErrMsg">{{photoErr}}</p>
-                <el-get-code v-show="!photoErrMsg" :photoNum="photoNum" v-on:codeErr = 'codeErr'></el-get-code>
+                <el-get-code v-show="!photoErrMsg" :photoNum="photoNum" type="login" v-on:codeErr = 'codeErr'></el-get-code>
               </li>
               <li><img src="../../assets/img/login/msg.png" alt="">
                 <input  type="tel" :maxlength="6" placeholder="请输入验证码"
@@ -52,8 +52,8 @@
         </ul>
       </div>
       <div class="register-btn">
-        <button v-if="loginType==='account'" @click="goToMyShop" :disabled="!goResultAcc" :class="{'disabled':!goResultAcc}">登录</button>
-        <button v-if="loginType==='tel'" @click="goToMyShop" :disabled="!goResultTel" :class="{'disabled':!goResultTel}">登录</button>
+        <button v-if="loginType==='account'" @click="goToMyShop('account')" :disabled="!goResultAcc" :class="{'disabled':!goResultAcc}">登录</button>
+        <button v-if="loginType==='tel'" @click="goToMyShop('tel')" :disabled="!goResultTel" :class="{'disabled':!goResultTel}">登录</button>
         <p @click="goToForgotPwd" v-if="loginType=='account'"><span class="">忘记密码</span></p>
       </div>
     </section>
@@ -65,7 +65,7 @@
   import GetCode from '@/components/GetCode'
   import md5 from 'blueimp-md5'
   import { Indicator } from 'mint-ui';
-  import {checkUserName} from '@/service/service'
+  import {checkUserName, userNameLogin, photoNumberLogin} from '@/service/service'
   export default {
     name: 'register',
     data () {
@@ -228,8 +228,32 @@
       goToForgotPwd () {
         this.$router.push({name: 'ForgotPwd'})
       },
-      goToMyShop () {
-        this.$router.push({name: 'MyShop'})
+      goToMyShop (type) {
+        Indicator.open('登录中...');
+          if(type==='account'){
+            userNameLogin(this.userName,this.Md5Pwd).then(res=>{
+              console.log(res)
+              sessionStorage.setItem('userID',res.data.content.id)
+              this.$router.push({name: 'MyShop'})
+              Indicator.close();
+            }).catch(err=>{
+              console.log(err.response)
+              Indicator.close();
+            })
+          }else{
+            photoNumberLogin(this.photoNum,this.msgCode).then(res=>{
+              console.log(res)
+              sessionStorage.setItem('userID',res.data.id)
+              this.$router.push({name: 'MyShop'})
+              Indicator.close();
+            }).catch(err=>{
+              console.log(err.response.data.message)
+              this.codeErrMsg = err.response.data.message
+              Indicator.close();
+            })
+          }
+
+
       },
       getResult(value,empty) {}
     },

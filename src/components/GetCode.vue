@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import {verifyPhoto} from '@/service/service'
+  import {registerVerifyCode,loginVerifyCode} from '@/service/service'
 export default {
   name: 'getCode',
   data () {
@@ -15,7 +15,7 @@ export default {
   },
   created(){
   },
-  props:['title','className','goTo','set','photoNum'],
+  props:['photoNum','type'],
   methods:{
     getSecurityCode(){
       if(parseInt( this.securityCode)){
@@ -31,15 +31,26 @@ export default {
             this.getCodeTime = this.waitTime
           }
         },1000)
-
-        verifyPhoto(this.photoNum).then(res=>{
-          sessionStorage.setItem('photoNum',this.photoNum)
+        if(this.type==='register') {
+          registerVerifyCode(this.photoNum).then(res=>{
+            sessionStorage.setItem('photoNum',this.photoNum)
             console.log(res)
-        }).catch(err=>{
-          console.log(err.response.data.message)
-          sessionStorage.setItem('codeErrMsg',err.response.data.message)
-          this.codeErr(err.response.data.message)
-        })
+          }).catch(err=>{
+            console.log(err.response.data.message)
+            sessionStorage.setItem('codeErrMsg',err.response.data.message)
+            this.codeErr(err.response.data.message)
+          })
+        }else{
+          loginVerifyCode(this.photoNum).then(res=>{
+            sessionStorage.setItem('photoNum',this.photoNum)
+            console.log(res)
+          }).catch(err =>{
+              console.log(err.response)
+            console.log(err.response.data.message)
+//            sessionStorage.setItem('codeErrMsg',err.response.data.message)
+            this.codeErr(err.response.data.message)
+          })
+        }
       }
     },
     codeErr(value){

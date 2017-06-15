@@ -32,9 +32,9 @@
 
 <script>
   import Header from '@/components/Head'
-  import {Actionsheet} from 'mint-ui';
+  import {Actionsheet, Indicator, Toast} from 'mint-ui';
   import ImageClip from '@/pages/takePhoto/ImageClip'
-  import {uploadImg} from '@/service/service'
+  import {updateShopLogo} from '@/service/service'
   export default {
     name: 'userManage',
     data () {
@@ -110,15 +110,29 @@
         img.src = url;
         img.onload = ()=>{
           let canvas = document.createElement("canvas");
-          canvas.width = width ? width : img.width;
-          canvas.height = height ? height : img.height;
+          canvas.width = api.winWidth;
+          canvas.height = api.winWidth;
           canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
           this.base64Url = canvas.toDataURL()
-          this.uploadImg()
+          this.uploadShopLogo()
         }
       },
-      uploadImg(){
-
+      uploadShopLogo(){
+        Indicator.open('图片上传...');
+        updateShopLogo(this.base64Url).then(res=>{
+            console.log(res.data)
+          Indicator.close();
+          Toast({
+            message: '上传成功',
+            iconClass: 'mintui mintui-success'
+          });
+        }).catch(err=>{
+          console.log(err.response)
+          Indicator.close();
+          Toast({
+            message: '上传失败，请重新上传'
+          });
+        })
       },
       // 前往编辑页面
       goToShopSignature (title, e) {

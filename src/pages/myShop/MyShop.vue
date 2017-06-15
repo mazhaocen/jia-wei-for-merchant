@@ -6,11 +6,11 @@
         <div class="head_img"><img src="../../assets/img/me/me-head.png" alt=""></div>
         <div class="head_text">
           <h4>客家厨子</h4>
-          <p v-if="false">店铺号:123456</p>
-          <a @click="goToUserManage" v-if="false">账户管理</a>
+          <p v-if="true">店铺号:123456</p>
+          <a @click="goToUserManage" v-if="true">账户管理</a>
         </div>
       </div>
-      <div v-if="false">
+      <div v-if="true">
         <ul class="today-data cl">
           <li @click="goToBalanceMoney">
             <span>今日成交总额</span>
@@ -34,7 +34,7 @@
           <li class="bd-t"><div></div><p>客服</p></li>
         </ul>
       </div>
-      <div v-if="true" class="open-button">
+      <div v-if="false" class="open-button">
         <button @click="goToNewShop">申请开店</button>
       </div>
 

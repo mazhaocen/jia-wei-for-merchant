@@ -20,28 +20,21 @@ let getGoodsManageList = () => {
 let checkUserName = (loginName) => {
   return axios({
     method: "GET",
-    url: url+'service-api/user/'+loginName
+    url: url+'/service-api/user/'+loginName
   })
 }
-// 获取手机验证码
-let verifyPhoto = (photoNum) =>{
-  return axios({
-    method:'GET',
-    url: url+'/user-component/verify/'+photoNum
-  })
-}
-let userRealInfo = (idCard,idCardFront,idCardBack,name,phoneNumber) => {
+
+let registerVerifyCode = (photoNum) =>{  // 获取注册手机验证码
   return axios({
     method:'POST',
-    url: url+'/user-component/user',
-    data: {
-      login: userName,
-      loginType: "Name",
-      password: pwd,
-      phone: photo,
-      // msgCode:msgCode
-    }
+    url: url+'/service-api/register/'+photoNum,
   })
+}
+let loginVerifyCode = (photoNum) =>{ // 获取登录手机验证码
+    return axios({
+      method:'POST',
+      url: url+'/service-api/login/'+photoNum,
+    })
 }
 let register = (userName,pwd,photo,msgCode,staffId) => { //提交注册
   return axios({
@@ -49,7 +42,7 @@ let register = (userName,pwd,photo,msgCode,staffId) => { //提交注册
     url: url+'/service-api/user',
     data: {
       login: userName,
-      loginType: "string",
+      loginType: "NAME",
       password: pwd,
       phone: photo,
       referee: staffId,
@@ -57,20 +50,84 @@ let register = (userName,pwd,photo,msgCode,staffId) => { //提交注册
     }
   })
 }
-let uploadImg = (sourceId,type,name,flies) => { //图片上传
+let openShop = (name,phone,idCard,idCardFront,idCardBack,type,userId) => {//申请开店
   return axios({
     method:'POST',
-    url: url+'/parameter-component/file/source/'+sourceId+'/type/'+type+'/name/'+name+'/base64',
+    url: url+'/service-api/merchant',
     data: {
-      fileStr:flies
+      realName: name,
+      phone: phone,
+      idCardNo: idCard,
+      idCardFront: idCardFront,
+      idCardBack: idCardBack,
+      merchantType: type,
+      userId: userId
     }
   })
 }
+let userNameLogin  = (userName, password) =>{ //用户名 + 密码登录
+  return axios({
+    method:'POST',
+    url: url+'/service-api/login',
+    data: {
+      name: userName,
+      password: password
+    }
+  })
+}
+let photoNumberLogin  = (userName, msgCode) =>{ //手机+验证码登录
+  return axios({
+    method:'POST',
+    url: url+'/service-api/verify-login',
+    data: {
+      name: userName,
+      password: msgCode
+    }
+  })
+}
+
+let updateShopLogo = (base64) =>{ //更新商户LOGO
+  return axios({
+    method:'PUT',
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/logo',
+    data:{
+      base64:base64
+    }
+  })
+}
+let updateShopName = (shopName) =>{ //更新商户名称
+  return axios({
+    method:'PUT',
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/name/'+shopName,
+  })
+}
+let updateShopAddress = (addressInfo) =>{ //更新商户地址
+  return axios({
+    method:'PUT',
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/address/',
+    data:addressInfo
+  })
+}
+let updateShopSlogan = (slogan) =>{ //更新商户签名
+  return axios({
+    method:'PUT',
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/slogan/'+slogan,
+  })
+}
+
+
+
 export {
   getGoodsManageList,
   checkUserName, // 检查用户可用性
-  verifyPhoto,
-  register,
-  uploadImg
-
+  registerVerifyCode, //获取注册手机验证码
+  loginVerifyCode, //获取登录手机验证码
+  register,//注册
+  openShop,//申请开店
+  userNameLogin, //用户名 + 密码登录
+  photoNumberLogin,//手机+验证码登录
+  updateShopLogo,//商户LOGO更新接口
+  updateShopName,//更新商户名称
+  updateShopAddress,//更新商户地址
+  updateShopSlogan,////更新商户签名
 }
