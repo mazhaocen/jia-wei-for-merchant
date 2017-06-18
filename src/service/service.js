@@ -89,7 +89,7 @@ let photoNumberLogin  = (userName, msgCode) =>{ //手机+验证码登录
 let updateShopLogo = (base64) =>{ //更新商户LOGO
   return axios({
     method:'PUT',
-    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/logo',
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('shopID')+'/logo',
     data:{
       base64:base64
     }
@@ -98,20 +98,26 @@ let updateShopLogo = (base64) =>{ //更新商户LOGO
 let updateShopName = (shopName) =>{ //更新商户名称
   return axios({
     method:'PUT',
-    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/name/'+shopName,
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('shopID')+'/name/'+shopName,
   })
 }
 let updateShopAddress = (addressInfo) =>{ //更新商户地址
   return axios({
     method:'PUT',
-    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/address/',
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('shopID')+'/address/',
     data:addressInfo
   })
 }
 let updateShopSlogan = (slogan) =>{ //更新商户签名
   return axios({
     method:'PUT',
-    url: url + '/service-api/merchant/'+sessionStorage.getItem('userID')+'/slogan/'+slogan,
+    url: url + '/service-api/merchant/'+sessionStorage.getItem('shopID')+'/slogan/'+slogan,
+  })
+}
+let getShopInfo = () =>{
+  return axios({
+    method:'GET',
+    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant',
   })
 }
 
@@ -130,4 +136,5 @@ export {
   updateShopName,//更新商户名称
   updateShopAddress,//更新商户地址
   updateShopSlogan,////更新商户签名
+  getShopInfo,//获取店铺信息
 }

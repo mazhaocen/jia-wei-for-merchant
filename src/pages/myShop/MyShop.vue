@@ -1,16 +1,16 @@
 <template>
   <div class="my_shop">
     <el-header title='我的店铺'></el-header>
-    <section class="content">
+    <section class="content" v-if="haveData">
       <div class="about_me">
         <div class="head_img"><img src="../../assets/img/me/me-head.png" alt=""></div>
         <div class="head_text">
           <h4>客家厨子</h4>
-          <p v-if="true">店铺号:123456</p>
-          <a @click="goToUserManage" v-if="true">账户管理</a>
+          <p v-if="haveShop">店铺号:123456</p>
+          <a @click="goToUserManage" v-if="haveShop">账户管理</a>
         </div>
       </div>
-      <div v-if="true">
+      <div v-if="haveShop">
         <ul class="today-data cl">
           <li @click="goToBalanceMoney">
             <span>今日成交总额</span>
@@ -34,7 +34,7 @@
           <li class="bd-t"><div></div><p>客服</p></li>
         </ul>
       </div>
-      <div v-if="false" class="open-button">
+      <div v-if="!haveShop" class="open-button">
         <button @click="goToNewShop">申请开店</button>
       </div>
 
@@ -46,11 +46,14 @@
 <script>
   import Footer from '@/components/Foot'
   import Header from '@/components/Head'
+  import {getShopInfo} from '@/service/service'
+  import {Indicator} from 'mint-ui';
 export default {
   name: 'me',
   data () {
     return {
-
+      haveShop:false,
+      haveData:false
     }
   },
   components:{
@@ -60,6 +63,24 @@ export default {
   created(){
 //    console.log(333);
 //    console.log(api.systemVersion)
+    Indicator.open('加载中...');
+    getShopInfo().then(res=>{
+        console.log(res)
+      if(res.status===200){
+        this.haveShop = true
+        console.log(res.data.content.manager.id)
+        sessionStorage.setItem('shopID',res.data.content.id)
+        sessionStorage.setItem('shopInfo',JSON.stringify(res.data.content))
+      }else if(res.status===204){
+        this.haveShop = false
+      }
+      this.haveData = true
+      Indicator.close();
+    }).catch(err=>{
+      this.haveShop = false
+        console.log(err.response)
+      Indicator.close();
+    })
   },
   methods:{
     goToAddGoods () {

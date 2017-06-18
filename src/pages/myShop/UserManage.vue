@@ -10,16 +10,16 @@
         </span>
         <!--<p>店铺头像</p><span><img :src="thumbImg" alt=""></span>-->
       </div>
-      <div><p>店铺名称</p><span @click="goToShopSignature('name',$event)">{{shopName ? shopName : '李婆婆菜档'}}</span></div>
+      <div><p>店铺名称</p><span @click="goToShopSignature('name',$event)">{{shopName}}</span></div>
       <div><p>店铺二维码</p><span></span></div>
       <div>
         <p>发货地址</p>
         <span @click="goToSendAddress($event)">
-          {{selectAddress = selectAddress ? selectAddress : '广东深圳南山区'}}{{inputAddress = inputAddress ? inputAddress : '新伟仔三项12号333号222'}}
+          {{selectAddress = selectAddress ? selectAddress : ''}}{{inputAddress = inputAddress ? inputAddress : ''}}
         </span>
       </div>
       <!--<div><p>地区（省 市）</p><span>深圳市南山区</span></div>-->
-      <div><p>店铺说明</p><span @click="goToShopSignature('sign',$event)">{{shopSign ? shopSign : '店铺签名 '}}</span></div>
+      <div><p>店铺说明</p><span @click="goToShopSignature('sign',$event)">{{shopSign}}</span></div>
       <p>安全设置</p>
       <div><p>支付密码</p><span></span></div>
       <p>其他</p>
@@ -53,20 +53,33 @@
       }
     },
     created(){
-      if (sessionStorage.getItem('takePhotoUrl')) {
-        this.shopImg = sessionStorage.getItem('takePhotoUrl')
-        sessionStorage.removeItem('takePhotoUrl')
+      let shopInfo = JSON.parse(sessionStorage.getItem('shopInfo'))
+      console.log(shopInfo)
+      this.shopImg = shopInfo.logo
+      this.shopName = shopInfo.name
+      this.shopSign = shopInfo.slogan
+      let shopAddress = shopInfo.mainContact
+      if(shopAddress){
+        this.selectAddress = shopAddress.province+shopAddress.city+shopAddress.district
+        this.inputAddress = shopInfo.mainContact.address
+      }else{
+        this.selectAddress = ''
+        this.inputAddress = ''
       }
-      if (sessionStorage.getItem('name')) {
-        this.shopName = sessionStorage.getItem('name')
-      }
-      if (sessionStorage.getItem('sign')) {
-        this.shopSign = sessionStorage.getItem('sign')
-      }
-      if (sessionStorage.getItem('inputAddress') && sessionStorage.getItem('selectAddress')) {
-        this.selectAddress = sessionStorage.getItem('selectAddress')
-        this.inputAddress = sessionStorage.getItem('inputAddress')
-      }
+//      if (sessionStorage.getItem('takePhotoUrl')) {
+//        this.shopImg = sessionStorage.getItem('takePhotoUrl')
+//        sessionStorage.removeItem('takePhotoUrl')
+//      }
+//      if (sessionStorage.getItem('name')) {
+//        this.shopName = sessionStorage.getItem('name')
+//      }
+//      if (sessionStorage.getItem('sign')) {
+//        this.shopSign = sessionStorage.getItem('sign')
+//      }
+//      if (sessionStorage.getItem('inputAddress') && sessionStorage.getItem('selectAddress')) {
+//        this.selectAddress = sessionStorage.getItem('selectAddress')
+//        this.inputAddress = sessionStorage.getItem('inputAddress')
+//      }
     },
     components: {
       'el-header': Header,
@@ -137,11 +150,8 @@
       // 前往编辑页面
       goToShopSignature (title, e) {
         this.$router.push({name: 'ShopSignature', params: {title: title}})
-        sessionStorage.setItem('my-shop-content', e.target.innerText)
       },
       goToSendAddress (e) {
-        sessionStorage.setItem('inputAddress', this.inputAddress)
-        sessionStorage.setItem('selectAddress', this.selectAddress)
         this.$router.push({name: 'SendAddress'})
       }
     },

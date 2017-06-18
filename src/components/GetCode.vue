@@ -31,16 +31,19 @@ export default {
             this.getCodeTime = this.waitTime
           }
         },1000)
-        if(this.type==='register') {
+        if(this.type==='register') { //获取注册验证码
           registerVerifyCode(this.photoNum).then(res=>{
             sessionStorage.setItem('photoNum',this.photoNum)
             console.log(res)
           }).catch(err=>{
             console.log(err.response.data.message)
-            sessionStorage.setItem('codeErrMsg',err.response.data.message)
+//            sessionStorage.setItem('codeErrMsg',err.response.data.message)
             this.codeErr(err.response.data.message)
+            clearInterval(msgTime)
+            this.securityCode = '获取验证码'
+            this.getCodeTime = this.waitTime
           })
-        }else{
+        }else{//获取登录验证码
           loginVerifyCode(this.photoNum).then(res=>{
             sessionStorage.setItem('photoNum',this.photoNum)
             console.log(res)
@@ -49,6 +52,9 @@ export default {
             console.log(err.response.data.message)
 //            sessionStorage.setItem('codeErrMsg',err.response.data.message)
             this.codeErr(err.response.data.message)
+            clearInterval(msgTime)
+            this.securityCode = '获取验证码'
+            this.getCodeTime = this.waitTime
           })
         }
       }

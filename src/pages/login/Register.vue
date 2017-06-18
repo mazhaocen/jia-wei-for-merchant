@@ -266,6 +266,7 @@
         Indicator.open('加载中...');
         register(this.userName,this.Md5Pwd,this.photoNum,this.msgCode).then(res=>{
           console.log(res)
+          sessionStorage.setItem('userID',res.data.content.id)
           Indicator.close();
           this.$router.push({name: 'MyShop'})
         }).catch(err=>{

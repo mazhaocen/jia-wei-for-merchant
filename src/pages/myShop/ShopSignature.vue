@@ -4,7 +4,7 @@
     <section class="content" style="background-color: #efefef">
       <textarea v-model="shopText" maxlength="40"></textarea>
       <div class="pd-1">
-        <span>店铺座右铭说明：</span>
+        <span>说明：</span>
         <p>1.不能包含（￥%&*@）等特殊字符;</p>
         <p>2.签名长度不能超过40个字符;</p>
       </div>
@@ -17,19 +17,23 @@
 
 <script>
   import Header from '@/components/Head'
-  import {MessageBox,Toast} from 'mint-ui';
+  import {MessageBox,Toast,Indicator} from 'mint-ui';
+  import {updateShopName, updateShopSlogan} from '@/service/service';
 
   export default {
     name: 'userManage',
     data () {
       return {
         title: '',
-        shopText: ''
+        shopText: '',
+        shopInfo:''
       }
     },
     created(){
+      this.shopInfo = JSON.parse(sessionStorage.getItem('shopInfo'))
       this.getTitle(this.$route.params.title)
-      this.shopText = sessionStorage.getItem('my-shop-content')
+      console.log(this.shopInfo)
+
     },
     components: {
       'el-header': Header
@@ -37,9 +41,11 @@
     methods: {
       getTitle (title) {
         if (title === 'sign') {
-          return this.title = '店铺签名'
+          this.title = '店铺签名'
+          this.shopText = this.shopInfo.slogan
         } else if (title === 'name') {
-          return this.title = '店铺名称'
+          this.title = '店铺名称'
+          this.shopText = this.shopInfo.name
         }
       },
       saveSetting () {
@@ -49,20 +55,55 @@
           showCancelButton: true,
           confirmButtonText:'确定'
         }).then(res =>{
+          Indicator.open('提交中...')
           if(res ==='confirm'){
-            sessionStorage.setItem(this.$route.params.title,this.shopText)
-            Toast({
-              message: '修改成功',
-              iconClass: 'mintui mintui-success'
-            });
-            history.go(-1)
+              if(this.$route.params.title ==='name') {
+                this.shopNameUpdate()
+              }else{
+                this.sloganUpdate()
+              }
           }else{
-
           }
         });
-
+      },
+      shopNameUpdate () {
+        updateShopName(this.shopText).then(res=>{
+          Indicator.close()
+          console.log(res)
+          this.shopInfo.name = this.shopText
+          sessionStorage.setItem('shopInfo',JSON.stringify(this.shopInfo))
+          Toast({
+            message: '修改成功',
+            iconClass: 'mintui mintui-success'
+          });
+          history.go(-1)
+        }).catch(err=>{
+          Indicator.close()
+          console.log(err.response)
+          Toast({
+            message: '修改失败，请重试',
+          });
+        })
+      },
+      sloganUpdate () {
+        updateShopSlogan(this.shopText).then(res=>{
+          Indicator.close()
+          console.log(res)
+           this.shopInfo.slogan = this.shopText
+          sessionStorage.setItem('shopInfo',JSON.stringify(this.shopInfo))
+          Toast({
+            message: '修改成功',
+            iconClass: 'mintui mintui-success'
+          });
+          history.go(-1)
+        }).catch(err=>{
+          Indicator.close()
+          console.log(err.response)
+          Toast({
+            message: '修改失败，请重试',
+          });
+        })
       }
-
     }
   }
 </script>

@@ -8,7 +8,7 @@
         </li>
         <li><p>手机号码</p><input type="tel" value="13500012345" v-model="photoNum" maxlength="11"><p class="err-msg">{{telErrMsg}}</p></li>
         <li><p>邮政编码</p><input type="tel" value="518000" v-model="ZipCode" maxlength="6"></li>
-        <li @click="chooseAddress"><p>地址</p><span v-if="!province">{{selectAddress}}</span><span v-if="province">{{province}}{{city}}{{country}}</span></li>
+        <li @click="chooseAddress"><p>地址</p><span v-if="province">{{province}}{{city}}{{country}}</span></li>
         <li><textarea placeholder="请输入具体地址" v-model="inputAddress" :maxlength="100"></textarea>
           <p class="err-msg" style="left: inherit; right: 0;">{{addressErr}}</p>
         </li>
@@ -22,7 +22,7 @@
 
 <script>
   import Header from '@/components/Head'
-  import {MessageBox,Toast} from 'mint-ui';
+  import {MessageBox,Toast,Indicator} from 'mint-ui';
   import {updateShopAddress} from '@/service/service'
   export default {
     name: 'userManage',
@@ -45,10 +45,28 @@
       }
     },
     created(){
-      if(sessionStorage.getItem('inputAddress') && sessionStorage.getItem('selectAddress')){
-        this.selectAddress = sessionStorage.getItem('selectAddress')
-        this.inputAddress = sessionStorage.getItem('inputAddress')
+      let addressInfo = JSON.parse(sessionStorage.getItem('shopInfo')).mainContact
+      if(addressInfo){
+          this.sendName = addressInfo.name
+          this.photoNum = addressInfo.phoneNumber
+          this.ZipCode = addressInfo.ZipCode
+          this.province = addressInfo.province
+          this.city = addressInfo.city
+          this.country = addressInfo.district
+          this.inputAddress = addressInfo.address
+      }else{
+        this.sendName = ''
+        this.photoNum = ''
+        this.ZipCode = ''
+        this.province = ''
+        this.city = ''
+        this.country = ''
+        this.inputAddress = ''
       }
+//      if(sessionStorage.getItem('inputAddress') && sessionStorage.getItem('selectAddress')){
+//        this.selectAddress = sessionStorage.getItem('selectAddress')
+//        this.inputAddress = sessionStorage.getItem('inputAddress')
+//      }
     },
     components:{
       'el-header':Header,
@@ -124,29 +142,46 @@
           confirmButtonText:'确定'
         }).then(res =>{
           if(res ==='confirm'){
+            Indicator.open('提交中...')
             let addressInfo = {
               name: this.sendName,
               phoneNumber: this.photoNum,
               province:this.province,
               city:this.city,
-//              country:
               district:this.country,
               zipCode:this.ZipCode,
               address:this.inputAddress
             }
+//            let addressInfo = {
+//              name: '',
+//              phoneNumber: '',
+//              province:'',
+//              city:'',
+//              district:'',
+//              zipCode:'',
+//              address:''
+//            }
             updateShopAddress(addressInfo).then(res=>{
-              console.log(res)
-            }).catch(err=>{
+              let shopInfo = JSON.parse(sessionStorage.getItem('shopInfo'))
+              shopInfo.mainContact.name = this.sendName
+              shopInfo.mainContact.phoneNumber = this.photoNum
+              shopInfo.mainContact.province = this.province
+              shopInfo.mainContact.city = this.city
+              shopInfo.mainContact.district = this.country
+              shopInfo.mainContact.zipCode = this.ZipCode
+              shopInfo.mainContact.address = this.inputAddress
+              sessionStorage.setItem('shopInfo',JSON.stringify(shopInfo))
+              Indicator.close()
+              Toast({
+                message: '修改成功',
+                iconClass: 'mintui mintui-success'
+              });
+              history.go(-1)
+              console.log(res.data.content)
+            }).catch(err =>{
               console.log(err.response)
+              Indicator.close()
             })
-
-            sessionStorage.setItem('selectAddress',this.province+this.city+this.country)
-            sessionStorage.setItem('inputAddress',this.inputAddress)
-            Toast({
-              message: '修改成功',
-              iconClass: 'mintui mintui-success'
-            });
-            history.go(-1)
           }else{
 
           }
