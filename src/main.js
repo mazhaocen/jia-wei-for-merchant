@@ -12,6 +12,7 @@ import './assets/js/address.js'
 import './assets/js/fastclick'
 import md5 from 'blueimp-md5'
 
+console.log(1)
 FastClick.attach(document.body);
 Vue.config.productionTip = false;
 let dpr = window.devicePixelRatio;
@@ -28,6 +29,7 @@ style.appendChild(styleCss)
 head.appendChild(style)
 // console.log(document.getElementById('head').appendChild())
 /* eslint-disable no-new */
+
 new Vue({
   el: '#app',
   router,
@@ -36,6 +38,8 @@ new Vue({
 })
 Vue.use(MintUi)
 Vue.use(md5)
+
+
 
 
 

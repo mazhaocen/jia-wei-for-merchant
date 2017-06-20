@@ -87,6 +87,7 @@ let photoNumberLogin  = (userName, msgCode) =>{ //手机+验证码登录
 }
 
 let updateShopLogo = (base64) =>{ //更新商户LOGO
+  console.log(base64)
   return axios({
     method:'PUT',
     url: url + '/service-api/merchant/'+sessionStorage.getItem('shopID')+'/logo',
@@ -120,6 +121,20 @@ let getShopInfo = () =>{
     url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant',
   })
 }
+let saveGoodsInfo = (goodsInfo) =>{
+  return axios({
+    method:'POST',
+    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant/'+sessionStorage.getItem('shopID')+'/commodity',
+    data:goodsInfo
+  })
+}
+let getGoodsList = () =>{
+  return axios({
+    method:'GET',
+    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant/'+sessionStorage.getItem('shopID'),
+  })
+}
+
 
 
 
@@ -137,4 +152,6 @@ export {
   updateShopAddress,//更新商户地址
   updateShopSlogan,////更新商户签名
   getShopInfo,//获取店铺信息
+  saveGoodsInfo,//保存商品信息
+  getGoodsList,//获取商铺商铺列表信息
 }

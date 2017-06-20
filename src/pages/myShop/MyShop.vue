@@ -3,10 +3,10 @@
     <el-header title='我的店铺'></el-header>
     <section class="content" v-if="haveData">
       <div class="about_me">
-        <div class="head_img"><img src="../../assets/img/me/me-head.png" alt=""></div>
+        <div class="head_img"><img :src="shopInfo.logoLink" alt=""></div>
         <div class="head_text">
-          <h4>客家厨子</h4>
-          <p v-if="haveShop">店铺号:123456</p>
+          <h4>{{shopInfo.name}}</h4>
+          <p v-if="haveShop">店铺号:{{shopInfo.code}}</p>
           <a @click="goToUserManage" v-if="haveShop">账户管理</a>
         </div>
       </div>
@@ -53,7 +53,8 @@ export default {
   data () {
     return {
       haveShop:false,
-      haveData:false
+      haveData:false,
+      shopInfo:''
     }
   },
   components:{
@@ -68,7 +69,7 @@ export default {
         console.log(res)
       if(res.status===200){
         this.haveShop = true
-        console.log(res.data.content.manager.id)
+        this.shopInfo = res.data.content
         sessionStorage.setItem('shopID',res.data.content.id)
         sessionStorage.setItem('shopInfo',JSON.stringify(res.data.content))
       }else if(res.status===204){

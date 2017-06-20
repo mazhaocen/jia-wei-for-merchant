@@ -233,6 +233,8 @@
           if(type==='account'){
             userNameLogin(this.userName,this.Md5Pwd).then(res=>{
               console.log(res)
+              localStorage.setItem('userName',this.userName)
+              localStorage.setItem('password',this.Md5Pwd)
               sessionStorage.setItem('userID',res.data.content.id)
               this.$router.push({name: 'MyShop'})
               Indicator.close();

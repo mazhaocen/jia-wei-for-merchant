@@ -23,7 +23,7 @@
       <p>安全设置</p>
       <div><p>支付密码</p><span></span></div>
       <p>其他</p>
-      <div><p>退出</p><span></span></div>
+      <div @click="loginOut"><p>退出</p><span></span></div>
     </section>
     <mt-actionsheet :actions="actions" v-model="sheetVisible"></mt-actionsheet>
     <image-clip class="the-top" v-if="imageClip" :imgUrl="imgUrl" v-on:clipImage='resultImage' :ratio="1"></image-clip>
@@ -32,7 +32,7 @@
 
 <script>
   import Header from '@/components/Head'
-  import {Actionsheet, Indicator, Toast} from 'mint-ui';
+  import {Actionsheet, Indicator, Toast,MessageBox} from 'mint-ui';
   import ImageClip from '@/pages/takePhoto/ImageClip'
   import {updateShopLogo} from '@/service/service'
   export default {
@@ -114,6 +114,7 @@
         });
       },
       resultImage(url){  //图片地址
+        console.log(url)
         this.getBase64Image(url)
         this.imageClip = false
         this.shopImg = url
@@ -126,13 +127,16 @@
           canvas.width = api.winWidth;
           canvas.height = api.winWidth;
           canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-          this.base64Url = canvas.toDataURL()
-          this.uploadShopLogo()
+          this.base64Url = canvas.toDataURL().split(',')[1]
+          console.log(this.base64Url)
+          setTimeout(()=>{
+            this.shopLogoUpload(this.base64Url)
+          },1000)
         }
       },
-      uploadShopLogo(){
+      shopLogoUpload(base64){
         Indicator.open('图片上传...');
-        updateShopLogo(this.base64Url).then(res=>{
+        updateShopLogo(base64).then(res=>{
             console.log(res.data)
           Indicator.close();
           Toast({
@@ -153,6 +157,22 @@
       },
       goToSendAddress (e) {
         this.$router.push({name: 'SendAddress'})
+      },
+      loginOut(){
+        MessageBox({
+          title: '提示',
+          message: '确定退出登录吗?',
+          showCancelButton: true
+        }).then(res =>{
+          if(res ==='confirm'){
+            localStorage.clear()
+            sessionStorage.clear()
+            this.$router.push({name:'Index'})
+          }else{
+            console.log('bu删除')
+          }
+        });
+
       }
     },
     mounted () {

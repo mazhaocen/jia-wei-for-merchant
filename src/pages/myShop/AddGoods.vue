@@ -8,45 +8,44 @@
       <form action="">
         <div class="pd-1 goods-title pr">
           <p>输入商品的标题</p>
-          <input type="text" v-model.trim="item.title" maxlength="60" required >
-          <span>{{item.title.length}}/60</span>
-          <b v-if="!item.title">请输入商品标题</b>
+          <input type="text" v-model.trim="item.title" maxlength="30" v-on:blur="inputBlur(item.title,'title')" >
+          <span>{{item.title.length}}/30</span>
+          <b>{{titleErrMsg}}</b>
         </div>
         <div class="goods-msg">
           <div @click="popupVisible = true">
             <span>类目 </span>
-            <input type="text" :value="item.category | typeFilter(value)" placeholder="请选择商品类型" readonly >
-            <b v-if="!item.category[0]">请选择商品类型</b>
+            <input type="text" :value="item.type | typeFilter(value)" placeholder="请选择商品类型" readonly >
+            <b>{{typeErrMsg}}</b>
           </div>
           <div>
             <span>价格 </span>
-            <input maxlength="10" type="text" v-model="item.price" v-on:blur="univalence(item.price,'price')"><i>/500g</i>
-            <b v-if="price">请输入正确单价(数字)</b>
+            <input maxlength="10" type="number" v-model.trim="item.price" v-on:blur="inputBlur(item.price,'price')" placeholder="0.00"><i>/500g</i>
           </div>
           <div>
             <span>库存 </span>
-            <input maxlength="10" type="text" v-model="item.inventory" v-on:blur="univalence(item.inventory,'inventory')" placeholder="0"><i>/份</i>
-            <b v-if="inventory">请输入库存数量(数字)</b>
+            <input maxlength="10" type="number" v-model.trim="item.stockQuantity" v-on:blur="inputBlur(item.stockQuantity,'stockQuantity')" placeholder="0"><i>/份</i>
           </div>
           <div>
             <span>运费 </span>
-            <input maxlength="10" type="text" v-model="item.freight" v-on:blur="univalence(item.freight,'freight')"><i>/元</i>
-            <b v-if="freight">请输入数字</b>
+            <input maxlength="10" type="number" v-model.trim="item.shippingCost" v-on:blur="inputBlur(item.shippingCost,'shippingCost')" placeholder="0.00"><i>/元</i>
           </div>
-          <div><p>宝贝描述</p><textarea v-model.trim="item.describe" maxlength="100"></textarea><i
-            style="top: 0;">{{item.describe.length}}/100</i></div>
+          <div><p>宝贝描述</p><textarea v-model.trim="item.description" maxlength="100" v-on:blur="inputBlur(item.description,'description')"></textarea><i
+            style="top: 0;">{{item.description.length}}/100</i>
+            <b>{{descriptionErr}}</b>
+          </div>
           <!--<div><p>发货地址</p><textarea></textarea><i></i></div>-->
         </div>
         <div class="my-shop-btn">
-          <button @click="saveWarehouse" type="submit">放入仓库</button>
-          <button @click="putAway" >立即发布</button>
+          <button type="button" @click="saveWarehouse">放入仓库</button>
+          <button type="button" @click="putAway" >立即发布</button>
         </div>
       </form>
     </section>
     <mt-popup v-model="popupVisible" position="bottom" class="type-list">
       <mt-checklist
         title="类目选项"
-        v-model="item.category"
+        v-model="item.type"
         :options="options">
       </mt-checklist>
     </mt-popup>
@@ -60,20 +59,23 @@
   import Header from '@/components/Head'
   import {Popup, Checklist, MessageBox,Toast,Actionsheet} from 'mint-ui';
   import ImageClip from '@/pages/takePhoto/ImageClip'
-  import {uploadImg} from '@/service/service'
+  import {saveGoodsInfo} from '@/service/service'
   export default {
     name: 'AddGoods',
     data () {
       return {
         sheetVisible: false,
-        actions: [],
         popupVisible: false,
+        actions: [],
         value: [],
         options: [],
-        item: {title: '',category:[] ,price: 0, inventory:0,freight: 0, describe: ''},
-        price: false,
-        freight: false,
-        inventory: false,
+        item: {title: '',type:[] ,price: 0, stockQuantity:0,shippingCost: 0, description: ''},
+        titleErrMsg:'',
+        typeErrMsg:'',
+//        priceErrMsg: '',
+//        stockQuantityErr: '',
+//        shippingCostErr: '',
+        descriptionErr:'',
         goodsImg:'',
         imgUrl:'',
         imageClip:false
@@ -88,14 +90,20 @@
       'image-clip': ImageClip
     },
     created(){
-      if (sessionStorage.getItem('goodsInfo')) {
-        this.item = JSON.parse(sessionStorage.getItem('goodsInfo'))
+      if(sessionStorage.getItem('goodsInfo')){
+        let item = JSON.parse(sessionStorage.getItem('goodsInfo'))
+        this.item ={
+          title: item.title,
+          type:item.type.split(',') ,
+          price: item.price,
+          stockQuantity:item.stockQuantity,
+          shippingCost: item.shippingCost,
+          description: item.description
+        }
         sessionStorage.removeItem('goodsInfo')
       }
-      if (sessionStorage.getItem('takePhotoUrl')){
-        this.goodsImg = sessionStorage.getItem('takePhotoUrl')
-        sessionStorage.removeItem('takePhotoUrl')
-      }
+    },
+    mounted () {
       this.actions = [{
         name: '拍照',
         method: this.takePhoto
@@ -103,35 +111,47 @@
         name: '在相册中选择',
         method: this.getPic
       }]
-    },
-    mounted () {
       this.options = ['水果', '蔬菜', '生肉', '海鲜', '禽类', '水产品', '速冻食品', '农副产品','土特产','山货','粮食','茶','其他'];
     },
     methods: {
-      univalence (value, text){ //   数字校验
-        console.log(value)
-        if (!(/^\d+(\.\d+)?$/.test(value))) {
-          this[text] = true;
-          return
-        }
-        if(value){
+      inputBlur(value, type){
+//          console.log(!value)
+        switch (type){
+          case 'title':
+//              if(!value){
+//                  this.titleErrMsg = '请输入商品名称'
+//              }else{
+//                this.titleErrMsg = ''
+//              }
+            break
+          case 'type':
+            break
+          case 'price':
+            this.item.price = this.toDecimal2(value)
+            break
+          case 'stockQuantity':
+            this.item.stockQuantity = parseInt(value)
+            break
+          case 'shippingCost':
+            this.item.shippingCost = this.toDecimal2(value)
+            break
+          case 'description':
+            break
 
         }
-        this[text] = false;
-        if (text === 'price') {
-          this.item.price = this.toDecimal2(value)
-        } else if (text === 'freight') {
-          this.item.freight = this.toDecimal2(value)
-        } /*else if(text === 'inventory') {
-          this.item.inventory = this.toDecimal2(value)
-        }*/
       },
+//      univalence (value, text){ //   数字校验
+//        console.log(/^\d+(\.\d{0,2})?$/.test(value))
+//        if (!(/^\d+(\.\d{0,2})?$/.test(value))) {
+//          return false
+//        }
+//      },
       toDecimal2 (x) { // 保留两位小数
         var f = parseFloat(x);
         if (isNaN(f)) {
-          return '';
+          return 0;
         }
-        var f = Math.round(x * 100) / 100;
+        f = Math.round(f * 100) / 100;
         var s = f.toString();
         var rs = s.indexOf('.');
         if (rs < 0) {
@@ -144,6 +164,9 @@
         return s;
       },
       putAway () {  // 立即发布
+        if(!this.verifiedInput()) {
+          return
+        }
         MessageBox({
           title: '提示',
           message: '您确认将此商品上架吗？',
@@ -161,6 +184,9 @@
         });
       },
       saveWarehouse () {
+       if(!this.verifiedInput()) {
+           return
+       }
         MessageBox({
           title: '提示',
           message: '您确认将此商品放入仓库吗？',
@@ -168,17 +194,30 @@
           confirmButtonText:'确定'
         }).then(res =>{
           if(res ==='confirm'){
-            Toast({
-              message: '存放成功',
-              iconClass: 'mintui mintui-success'
-            });
+              this.saveGoodsInfo()
           }else{
 
           }
         });
       },
-      inputVerify () {  //输入验证
-
+      verifiedInput(){
+        this.titleErrMsg=''
+        this.typeErrMsg=''
+        this.descriptionErr=''
+        console.log(!this.item.title,this.item.type.length===0,!this.item.description);
+        if(!this.item.title){
+          this.titleErrMsg='请输入商品标题'
+          return false
+        }else
+        if(this.item.type.length===0){
+          this.typeErrMsg='请选择商品类型'
+          return false
+        }else
+        if(!this.item.description){
+          this.descriptionErr='请输入商品描述'
+          return false
+        }
+        return true
       },
       takePhoto () { // 拍照
         this.getPhoto('camera')
@@ -223,7 +262,19 @@
 //          this.uploadImg()
         }
       },
-      uploadImg () {
+      saveGoodsInfo () {
+        let item = JSON.parse(JSON.stringify(this.item))
+        item.type = item.type.join(',')
+        console.log(item)
+//        saveGoodsInfo(this.item).then(res=>{
+//          Toast({
+//            message: '存放成功',
+//            iconClass: 'mintui mintui-success'
+//          });
+//            console.log(res)
+//        }).catch(err=>{
+//            console.log(err.response)
+//        })
       }
     },
     filters: {
@@ -249,23 +300,19 @@
     background-color: #efefef;
     height: 40vh;
   }
-
   .goods-msg > div > span, .goods-msg > div > p {
     text-align: left;
   }
-
   .goods-msg > div > span {
     display: block;
     float: left;
   }
-
   .goods-msg > div > b, .goods-title b {
     color: orangered;
     display: block;
     line-height: 1.6rem;
     text-align: right;
   }
-
   .goods-msg > div {
     padding: 0 1.111rem;
     border-bottom: 0.3rem solid #efefef;
@@ -273,7 +320,6 @@
     text-align: right;
     position: relative;
   }
-
   .goods-msg textarea {
     width: 100%;
     height: 4rem;
@@ -281,7 +327,6 @@
     padding: .5rem 1rem;
     white-space: normal;
   }
-
   .goods-msg input {
     width: 85%;
     margin-left: 1rem;
@@ -293,7 +338,6 @@
     color: #cccccc;
     position: absolute;
   }
-
   .add_goods input {
     border: 1px solid #efefef;
     height: 3rem;
@@ -304,12 +348,10 @@
     margin-bottom: 1rem;
     padding-left: 1rem;
   }
-
   .goods-title {
     border-bottom: .5rem solid #efefef;
     line-height: 2rem;
   }
-
   .goods-img>i {
     display: block;
     background: url("../../assets/img/addGoods/add-goods.png") no-repeat center center/100%;
@@ -317,7 +359,5 @@
   }
   .goods-img {
     border-bottom: 2px solid #efefef;
-
-
   }
 </style>

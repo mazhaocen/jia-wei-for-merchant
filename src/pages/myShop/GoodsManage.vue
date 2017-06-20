@@ -14,7 +14,7 @@
             <div class="fl goods-info_text">
               <h3>{{item.title}}</h3>
               <span>￥{{item.price}} <i>/500g</i></span>
-              <p><span> 已售:{{item.haveSale}}份</span><span>库存：{{item.inventory}}份</span></p>
+              <p><span> 已售:0份</span><span>库存：{{item.stockQuantity}}份</span></p>
             </div>
           </div>
           <ul>
@@ -36,7 +36,7 @@
 <script>
   import Header from '@/components/Head'
   import { MessageBox } from 'mint-ui';
-  import {getGoodsManageList} from '../../service/service'
+  import {getGoodsManageList,getGoodsList} from '../../service/service'
 export default {
   name: 'GoodsManage',
   data () {
@@ -49,53 +49,12 @@ export default {
     'el-header':Header
   },
   created(){
-      this.items =[
-          {
-            "title":"农家自产西红柿",
-            "category":["自产","蔬菜"],
-            "price":"2.50",
-            "haveSale":500,
-            "inventory":200,
-            "status":"selling",
-            "describe":"农家自产西红柿",
-            "freight":"0.00"
-          },
-          {
-            "title":"大白菜",
-            "category":["自产","蔬菜"],
-            "price":"4.50",
-            "haveSale":100,
-            "inventory":400,
-            "status":"selling",
-            "describe":"大白菜",
-            "freight":"0.00"
-          },
-          {
-            "title":"土豆",
-            "category":["自产","蔬菜"],
-            "price":"6.00",
-            "haveSale":300,
-            "inventory":100,
-            "status":"selling",
-            "describe":"土豆",
-            "freight":"0.00"
-          },
-          {
-            "title":"鸡蛋",
-            "category":["自产","蔬菜"],
-            "price":"2.00",
-            "haveSale":530,
-            "inventory":210,
-            "status":"warehouse",
-            "describe":"鸡蛋",
-            "freight":"0.00"
-          }
-        ]
-//    getGoodsManageList().then(res=>{
-//        this.items = res.data.data
-//    }).catch(err=>{
-//        console.log(err)
-//    })
+    getGoodsList().then(res=>{
+        console.log(res)
+        this.items = res.data.content
+    }).catch(err=>{
+        console.log(err.response)
+    })
   },
   methods:{
     goToAddGoods () {

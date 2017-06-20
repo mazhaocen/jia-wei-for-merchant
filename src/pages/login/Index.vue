@@ -13,7 +13,8 @@
 </template>
 
 <script>
-
+  import { Indicator } from 'mint-ui';
+  import {userNameLogin} from '@/service/service'
   export default {
     name: 'login',
     data () {
@@ -21,6 +22,17 @@
     },
     created(){
       window.page = 'index'
+      if(localStorage.getItem('userName') && localStorage.getItem('password')){
+        userNameLogin(localStorage.getItem('userName'),localStorage.getItem('password')).then(res=>{
+          console.log(res)
+          sessionStorage.setItem('userID',res.data.content.id)
+          this.$router.push({name: 'MyShop'})
+          Indicator.close();
+        }).catch(err=>{
+          console.log(err.response)
+          Indicator.close();
+        })
+      }
     },
     methods: {
       goToLogin () {

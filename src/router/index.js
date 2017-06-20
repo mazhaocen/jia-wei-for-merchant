@@ -7,6 +7,7 @@ import Router from 'vue-router'
 // import Cooker from '@/pages/cooker/Cooker'
 // import Live from '@/pages/live/Live'
 // import ShoppingCar from '@/pages/shoppingCar/ShoppingCar'
+console.log(2)
 import MyShop from '@/pages/myShop/MyShop'
 import AddGoods from '@/pages/myShop/AddGoods'
 import GoodsManage from '@/pages/myShop/GoodsManage'
