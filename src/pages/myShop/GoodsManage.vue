@@ -21,7 +21,7 @@
             <li @click="goToEditGoods(item)">编辑宝贝</li>
             <li @click="statusChange(item.id ,$event)" >{{(goodsType==='OFF')?'上架':(goodsType==='ON')?'下架':'下架'}}</li>
             <li @click="share(item.title)">分享</li>
-            <li @click="deleteGoodsLi(index)">删除</li>
+            <li @click="statusChange(item.id,$event,index)">删除</li>
           </ul>
         </li>
       </ul>
@@ -72,20 +72,20 @@ export default {
     deleteSure(index){
       this.items.splice(index,1)
     },
-    deleteGoodsLi (index) {
-      MessageBox({
-        title: '提示',
-        message: '确定删除此商品吗?',
-        showCancelButton: true
-      }).then(res =>{
-        if(res ==='confirm'){
-          this.deleteSure(index)
-        }else{
-          console.log('bu删除')
-        }
-      });
-    },
-    statusChange (id,e) {
+//    deleteGoodsLi (index) {
+//      MessageBox({
+//        title: '提示',
+//        message: '确定删除此商品吗?',
+//        showCancelButton: true
+//      }).then(res =>{
+//        if(res ==='confirm'){
+//          this.deleteSure(index)
+//        }else{
+//          console.log('bu删除')
+//        }
+//      });
+//    },
+    statusChange (id,e,index) {
         console.log(id)
       let status
       if (e.target.innerText === '上架'){
@@ -95,11 +95,11 @@ export default {
       }else if(e.target.innerText === '删除'){
         status = 'DELETE'
       }
-      goodsManage (id,status).then(res=>{
-          console.log(res)
-      }).catch(err=>{
-          console.log(err.response)
-      })
+//      goodsManage (id,status).then(res=>{
+//          console.log(res)
+//      }).catch(err=>{
+//          console.log(err.response)
+//      })
       MessageBox({
         title: '提示',
         message: '确定将此商品'+e.target.innerText+'么?',
@@ -111,9 +111,11 @@ export default {
             if(e.target.innerText==='下架'){
               e.target.innerText = '上架'
 //              this.items[index].status='warehouse'
-            }else{
+            }else if(e.target.innerText==='上架') {
               e.target.innerText='下架'
 //              this.items[index].status='selling'
+            }else if(e.target.innerText==='删除'){
+              this.deleteSure(index)
             }
           }).catch(err=>{
             console.log(err.response)
