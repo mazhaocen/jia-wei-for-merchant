@@ -152,15 +152,6 @@
               zipCode:this.ZipCode,
               address:this.inputAddress
             }
-//            let addressInfo = {
-//              name: '',
-//              phoneNumber: '',
-//              province:'',
-//              city:'',
-//              district:'',
-//              zipCode:'',
-//              address:''
-//            }
             updateShopAddress(addressInfo).then(res=>{
               let shopInfo = JSON.parse(sessionStorage.getItem('shopInfo'))
               shopInfo.mainContact.name = this.sendName

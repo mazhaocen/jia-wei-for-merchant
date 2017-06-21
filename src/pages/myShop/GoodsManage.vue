@@ -3,23 +3,23 @@
     <el-header title='宝贝管理' className="go_back"></el-header>
     <section class="content" style="background-color: #efefef;padding-bottom: 0;">
       <ul class="goods-type cl">
-        <li :class="{active:goodsType=='all'}" @click="goodsManageType('all')">全部宝贝({{items.length}})</li>
-        <li :class="{active:goodsType=='selling'}" @click="goodsManageType('selling')">出售中</li>
-        <li :class="{active:goodsType=='warehouse'}" @click="goodsManageType('warehouse')">仓库中</li>
+        <li :class="{active:goodsType==''}" @click="goodsManageType('')">全部宝贝 <span v-if="goodsType==''">({{items.length}})</span></li>
+        <li :class="{active:goodsType=='ON'}" @click="goodsManageType('ON')">出售中<span v-if="goodsType=='ON'">({{items.length}})</span></li>
+        <li :class="{active:goodsType=='OFF'}" @click="goodsManageType('OFF')">仓库中<span v-if="goodsType=='OFF'">({{items.length}})</span></li>
       </ul>
       <ul class="goods-manage_list cl">
-        <li v-for="(item,index) in items" v-if="goodsType==='all' || item.status == goodsType">
+        <li v-for="(item,index) in items" >
           <div class="goods-info cl">
             <div class="fl goods-info_img"><img src="" alt=""></div>
             <div class="fl goods-info_text">
               <h3>{{item.title}}</h3>
-              <span>￥{{item.price}} <i>/500g</i></span>
+              <span>￥{{toDecimal2(item.price)}} <i>/500g</i></span>
               <p><span> 已售:0份</span><span>库存：{{item.stockQuantity}}份</span></p>
             </div>
           </div>
           <ul>
             <li @click="goToEditGoods(item)">编辑宝贝</li>
-            <li @click="takeOff(index,$event)" >{{(item.status=='warehouse')?'上架':'下架'}}</li>
+            <li @click="statusChange(item.id ,$event)" >{{(goodsType==='OFF')?'上架':(goodsType==='ON')?'下架':'下架'}}</li>
             <li @click="share(item.title)">分享</li>
             <li @click="deleteGoodsLi(index)">删除</li>
           </ul>
@@ -36,12 +36,12 @@
 <script>
   import Header from '@/components/Head'
   import { MessageBox } from 'mint-ui';
-  import {getGoodsManageList,getGoodsList} from '../../service/service'
+  import {getGoodsManageList,getGoodsList,goodsManage} from '../../service/service'
 export default {
   name: 'GoodsManage',
   data () {
     return {
-      goodsType:'all',
+      goodsType:'',
       items:[],
     }
   },
@@ -61,7 +61,13 @@ export default {
       this.$router.push({name:'AddGoods'})
     },
     goodsManageType(type){
-      this.goodsType=type
+      this.goodsType= type
+      getGoodsList(type).then(res=>{
+        console.log(res)
+        this.items = res.data.content
+      }).catch(err=>{
+        console.log(err.response)
+      })
     },
     deleteSure(index){
       this.items.splice(index,1)
@@ -79,20 +85,40 @@ export default {
         }
       });
     },
-    takeOff (index,e) {
+    statusChange (id,e) {
+        console.log(id)
+      let status
+      if (e.target.innerText === '上架'){
+        status = 'ON'
+      }else if(e.target.innerText === '下架') {
+        status = 'OFF'
+      }else if(e.target.innerText === '删除'){
+        status = 'DELETE'
+      }
+      goodsManage (id,status).then(res=>{
+          console.log(res)
+      }).catch(err=>{
+          console.log(err.response)
+      })
       MessageBox({
         title: '提示',
         message: '确定将此商品'+e.target.innerText+'么?',
         showCancelButton: true
       }).then(res =>{
         if(res ==='confirm'){
-          if(e.target.innerText==='下架'){
-            e.target.innerText = '上架'
-            this.items[index].status='warehouse'
-          }else{
-            e.target.innerText='下架'
-            this.items[index].status='selling'
-          }
+          goodsManage (id,status).then(res=>{
+            console.log(res)
+            if(e.target.innerText==='下架'){
+              e.target.innerText = '上架'
+//              this.items[index].status='warehouse'
+            }else{
+              e.target.innerText='下架'
+//              this.items[index].status='selling'
+            }
+          }).catch(err=>{
+            console.log(err.response)
+          })
+
 
         }else{
           console.log('bu删除')
@@ -103,6 +129,23 @@ export default {
         console.log(JSON.stringify(item))
       sessionStorage.setItem('goodsInfo',JSON.stringify(item))
       this.$router.push({name:'AddGoods'})
+    },
+    toDecimal2 (x) { // 保留两位小数
+      let f = parseFloat(x);
+      if (isNaN(f)) {
+        return 0;
+      }
+      f = Math.round(f * 100) / 100;
+      let s = f.toString();
+      let rs = s.indexOf('.');
+      if (rs < 0) {
+        rs = s.length;
+        s += '.';
+      }
+      while (s.length <= rs + 2) {
+        s += '0';
+      }
+      return s;
     },
     share (title) {
       var sharedModule = api.require('shareAction');

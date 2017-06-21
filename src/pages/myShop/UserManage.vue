@@ -55,7 +55,7 @@
     created(){
       let shopInfo = JSON.parse(sessionStorage.getItem('shopInfo'))
       console.log(shopInfo)
-      this.shopImg = shopInfo.logo
+      this.shopImg = shopInfo.logoLink
       this.shopName = shopInfo.name
       this.shopSign = shopInfo.slogan
       let shopAddress = shopInfo.mainContact

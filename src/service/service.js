@@ -115,23 +115,33 @@ let updateShopSlogan = (slogan) =>{ //更新商户签名
     url: url + '/service-api/merchant/'+sessionStorage.getItem('shopID')+'/slogan/'+slogan,
   })
 }
-let getShopInfo = () =>{
+let getShopInfo = () =>{ //获取商铺信息
   return axios({
     method:'GET',
     url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant',
   })
 }
-let saveGoodsInfo = (goodsInfo) =>{
+let saveGoodsInfo = (goodsInfo) =>{ //保存添加的商商品
   return axios({
     method:'POST',
     url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant/'+sessionStorage.getItem('shopID')+'/commodity',
     data:goodsInfo
   })
 }
-let getGoodsList = () =>{
+let getGoodsList = (status) =>{ // 获取商品列表
   return axios({
     method:'GET',
-    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant/'+sessionStorage.getItem('shopID'),
+    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant/'+sessionStorage.getItem('shopID')+'/commodity-list',
+    params:{
+      commodityStatus:status
+    }
+  })
+}
+let goodsManage = (goodID,opt) =>{ // 商品 上架下架 删除
+  return axios({
+    method:'PUT',
+    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/commodity/'+goodID,
+    data:opt
   })
 }
 
@@ -154,4 +164,5 @@ export {
   getShopInfo,//获取店铺信息
   saveGoodsInfo,//保存商品信息
   getGoodsList,//获取商铺商铺列表信息
+  goodsManage,//商品管理
 }

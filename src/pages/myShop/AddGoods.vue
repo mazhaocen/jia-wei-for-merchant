@@ -57,7 +57,7 @@
 <script>
   import Footer from '@/components/Foot'
   import Header from '@/components/Head'
-  import {Popup, Checklist, MessageBox,Toast,Actionsheet} from 'mint-ui';
+  import {Popup, Checklist, MessageBox,Toast,Actionsheet,Indicator} from 'mint-ui';
   import ImageClip from '@/pages/takePhoto/ImageClip'
   import {saveGoodsInfo} from '@/service/service'
   export default {
@@ -69,12 +69,9 @@
         actions: [],
         value: [],
         options: [],
-        item: {title: '',type:[] ,price: 0, stockQuantity:0,shippingCost: 0, description: ''},
+        item: {title: '',type:[] ,price: 0, stockQuantity:0,shippingCost: 0, description: '',id:'',headImage:''},
         titleErrMsg:'',
         typeErrMsg:'',
-//        priceErrMsg: '',
-//        stockQuantityErr: '',
-//        shippingCostErr: '',
         descriptionErr:'',
         goodsImg:'',
         imgUrl:'',
@@ -98,7 +95,8 @@
           price: item.price,
           stockQuantity:item.stockQuantity,
           shippingCost: item.shippingCost,
-          description: item.description
+          description: item.description,
+          id:item.id
         }
         sessionStorage.removeItem('goodsInfo')
       }
@@ -194,6 +192,7 @@
           confirmButtonText:'确定'
         }).then(res =>{
           if(res ==='confirm'){
+            Indicator.open('正在保存...')
               this.saveGoodsInfo()
           }else{
 
@@ -250,31 +249,37 @@
         this.imageClip = false
         this.goodsImg = url
       },
-      getBase64Image (url,width,height,callback) {//转base64
+      getBase64Image (url,callback) {//转base64
         let img = new Image();
         img.src = url;
         img.onload = ()=>{
           let canvas = document.createElement("canvas");
-          canvas.width = width ? width : img.width;
-          canvas.height = height ? height : img.height;
+          canvas.width = api.winWidth;
+          canvas.height = api.winWidth*0.3963;
           canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-          this.base64Url = canvas.toDataURL()
+          this.item.headImage = canvas.toDataURL().split(',')[1]
 //          this.uploadImg()
         }
       },
       saveGoodsInfo () {
         let item = JSON.parse(JSON.stringify(this.item))
         item.type = item.type.join(',')
-        console.log(item)
-//        saveGoodsInfo(this.item).then(res=>{
-//          Toast({
-//            message: '存放成功',
-//            iconClass: 'mintui mintui-success'
-//          });
-//            console.log(res)
-//        }).catch(err=>{
-//            console.log(err.response)
-//        })
+        console.log(JSON.stringify(item))
+
+        saveGoodsInfo(item).then(res=>{
+          Indicator.close()
+          Toast({
+            message: '存放成功',
+            iconClass: 'mintui mintui-success'
+          });
+            console.log(res)
+        }).catch(err=>{
+            console.log(err.response)
+          Indicator.close()
+          Toast({
+            message: '保存失败',
+          });
+        })
       }
     },
     filters: {
