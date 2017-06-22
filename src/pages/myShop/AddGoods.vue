@@ -3,7 +3,7 @@
     <el-header title='发布宝贝' className="go_back"></el-header>
     <section class="content" style="padding-bottom: 0">
       <div class="goods-img" @click="sheetVisible = true">
-        <i><img :src="goodsImg" alt=""></i>
+        <i><img :src="item.headImageLink" alt=""></i>
       </div>
       <form action="">
         <div class="pd-1 goods-title pr">
@@ -37,8 +37,8 @@
           <!--<div><p>发货地址</p><textarea></textarea><i></i></div>-->
         </div>
         <div class="my-shop-btn">
-          <button type="button" @click="saveWarehouse">放入仓库</button>
-          <button type="button" @click="putAway" >立即发布</button>
+          <button type="button" @click="saveORPutAway('OFF')">放入仓库</button>
+          <button type="button" @click="saveORPutAway('ON')" >立即发布</button>
         </div>
       </form>
     </section>
@@ -69,7 +69,7 @@
         actions: [],
         value: [],
         options: [],
-        item: {title: '',type:[] ,price: 0, stockQuantity:0,shippingCost: 0, description: '',id:'',headImage:''},
+        item: {title: '',type:[] ,price: 0, stockQuantity:0,shippingCost: 0, description: '',id:'',headImageLink:''},
         titleErrMsg:'',
         typeErrMsg:'',
         descriptionErr:'',
@@ -88,16 +88,18 @@
     },
     created(){
       if(sessionStorage.getItem('goodsInfo')){
-        let item = JSON.parse(sessionStorage.getItem('goodsInfo'))
-        this.item ={
-          title: item.title,
-          type:item.type.split(',') ,
-          price: item.price,
-          stockQuantity:item.stockQuantity,
-          shippingCost: item.shippingCost,
-          description: item.description,
-          id:item.id
-        }
+          let item = JSON.parse(sessionStorage.getItem('goodsInfo'))
+        this.item =item
+        this.item.type = item.type.split(',')
+//          title: item.title,
+//          type:item.type.split(',') ,
+//          price: item.price,
+//          stockQuantity:item.stockQuantity,
+//          shippingCost: item.shippingCost,
+//          description: item.description,
+//          id:item.id,
+//          headImageLink:item.headImageLink
+//        }
         sessionStorage.removeItem('goodsInfo')
       }
     },
@@ -161,44 +163,25 @@
         }
         return s;
       },
-      putAway () {  // 立即发布
+      // 保存仓库  立即发布
+      saveORPutAway (type) {
         if(!this.verifiedInput()) {
           return
         }
         MessageBox({
           title: '提示',
-          message: '您确认将此商品上架吗？',
+          message: '您确认将此商品'+ (type==='OFF'?'放入仓库':'上架')+'吗？',
           showCancelButton: true,
           confirmButtonText:'确定'
         }).then(res =>{
           if(res ==='confirm'){
-            Toast({
-              message: '上架成功',
-              iconClass: 'mintui mintui-success'
-            });
+            Indicator.open('正在'+(type==='OFF'?'保存':'上架')+'...')
+            this.saveGoodsInfo(type)
           }else{
-
           }
         });
       },
-      saveWarehouse () {
-       if(!this.verifiedInput()) {
-           return
-       }
-        MessageBox({
-          title: '提示',
-          message: '您确认将此商品放入仓库吗？',
-          showCancelButton: true,
-          confirmButtonText:'确定'
-        }).then(res =>{
-          if(res ==='confirm'){
-            Indicator.open('正在保存...')
-              this.saveGoodsInfo()
-          }else{
 
-          }
-        });
-      },
       verifiedInput(){
         this.titleErrMsg=''
         this.typeErrMsg=''
@@ -261,15 +244,15 @@
 //          this.uploadImg()
         }
       },
-      saveGoodsInfo () {
+      saveGoodsInfo (type) {
         let item = JSON.parse(JSON.stringify(this.item))
         item.type = item.type.join(',')
         console.log(JSON.stringify(item))
 
-        saveGoodsInfo(item).then(res=>{
+        saveGoodsInfo(type,item).then(res=>{
           Indicator.close()
           Toast({
-            message: '存放成功',
+            message: (type==='ON'?'上架':'保存')+'成功',
             iconClass: 'mintui mintui-success'
           });
             console.log(res)

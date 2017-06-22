@@ -121,10 +121,10 @@ let getShopInfo = () =>{ //获取商铺信息
     url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant',
   })
 }
-let saveGoodsInfo = (goodsInfo) =>{ //保存添加的商商品
+let saveGoodsInfo = (type,goodsInfo) =>{ //保存添加的商商品
   return axios({
     method:'POST',
-    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant/'+sessionStorage.getItem('shopID')+'/commodity',
+    url: url + '/service-api/user/'+sessionStorage.getItem('userID')+'/merchant/'+sessionStorage.getItem('shopID')+'/commodity/'+type,
     data:goodsInfo
   })
 }
