@@ -7,22 +7,22 @@
         <div class="head_text">
           <h4>{{shopInfo.name}}</h4>
           <p v-if="haveShop">店铺号:{{shopInfo.code}}</p>
-          <a @click="goToUserManage" v-if="haveShop">账户管理</a>
+          <a @click="goToUserManage">账户管理</a>
         </div>
       </div>
       <div v-if="haveShop">
         <ul class="today-data cl">
           <li @click="goToBalanceMoney">
             <span>今日成交总额</span>
-            <p>￥234</p>
+            <p>￥0</p>
           </li>
           <li>
             <span>今日访客</span>
-            <p>34</p>
+            <p>0</p>
           </li>
           <li>
             <span>今日订单</span>
-            <p>14</p>
+            <p>0</p>
           </li>
         </ul>
         <ul class="order-list">
@@ -35,9 +35,12 @@
         </ul>
       </div>
       <div v-if="!haveShop" class="open-button">
-        <button @click="goToNewShop">申请开店</button>
-      </div>
+        <button type="button" @click="goToNewShop">申请开店</button>
 
+      </div>
+      <div v-if="!haveShop" class="banner">
+        <img src="../../assets/img/myShop/banner.png" alt="">
+      </div>
     </section>
     <!--<el-footer :choose=5></el-footer>-->
   </div>
@@ -64,6 +67,7 @@ export default {
   created(){
 //    console.log(333);
 //    console.log(api.systemVersion)
+    window.page = 'myShop'
     Indicator.open('加载中...');
     getShopInfo().then(res=>{
         console.log(res)
@@ -102,20 +106,24 @@ export default {
     goToNewShop () {
       this.$router.push({name: 'NewShop'})
     }
+  },
+  destroyed () {
+    window.page=''
   }
 }
 </script>
 
 <style scoped>
+  .banner{
+    width: 80%;
+    margin: 3rem auto;
+  }
   .open-button>button{
-    width: 14rem;
-    height: 4rem;
-    margin-top: 5rem;
-    background-color: #dddddd;
-    color: #008842;
+    width: 100%;
+    height: 5rem;
+    background-color: #008842;
+    color: #ffffff;
     font-size: 1.3rem;
-    border-radius: 3px;
-    border:1px solid #008842;
   }
   .open-button{
     text-align: center;
@@ -208,7 +216,7 @@ export default {
     -webkit-border-radius:50%;
     -moz-border-radius:50%;
     border-radius:50%;
-    background: url("../../assets/img/me/me-head.png") no-repeat center center /4.333rem;
+    background: url("../../assets/img/myShop/logo.png") no-repeat center center /4.333rem;
     overflow: hidden;
   }
   .about_me{

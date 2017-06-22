@@ -196,6 +196,7 @@ ul.mint-actionsheet-list>li{
   top:0;
   background-color: #008842;
   color: #ffffff;
+  line-height: 4.5rem;
 }
 .register footer {
   bottom: 0;

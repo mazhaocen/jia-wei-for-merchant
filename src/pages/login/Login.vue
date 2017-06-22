@@ -301,6 +301,6 @@
   }
   footer{
     height: 4.5rem;
-    line-height: 4.5rem;
+    line-height: 4.5rem!important;
   }
 </style>

@@ -1,8 +1,8 @@
 <template>
   <div class="register" style="padding: 0">
     <header>注册</header>
-    <section class="content" style="padding-bottom: 0">
-      <div style="margin-top: 2rem">
+    <section class="content" style="padding-bottom: 0;padding-top: 4.5rem">
+      <div style="margin-top: 0.5rem">
         <ul class=" register-input account cl">
           <li>
             <img src="../../assets/img/login/user.png" alt="">

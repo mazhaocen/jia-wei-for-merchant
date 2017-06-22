@@ -50,19 +50,11 @@ let register = (userName,pwd,photo,msgCode,staffId) => { //提交注册
     }
   })
 }
-let openShop = (name,phone,idCard,idCardFront,idCardBack,type,userId) => {//申请开店
+let openShop = (shopInfo) => {//申请开店
   return axios({
     method:'POST',
     url: url+'/service-api/merchant',
-    data: {
-      realName: name,
-      phone: phone,
-      idCardNo: idCard,
-      idCardFront: idCardFront,
-      idCardBack: idCardBack,
-      merchantType: type,
-      userId: userId
-    }
+    data: shopInfo
   })
 }
 let userNameLogin  = (userName, password) =>{ //用户名 + 密码登录
@@ -91,9 +83,9 @@ let updateShopLogo = (base64) =>{ //更新商户LOGO
   return axios({
     method:'PUT',
     url: url + '/service-api/merchant/'+sessionStorage.getItem('shopID')+'/logo',
-    data:{
-      base64:base64
-    }
+      data:{
+        base64:base64
+      }
   })
 }
 let updateShopName = (shopName) =>{ //更新商户名称

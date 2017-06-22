@@ -29,20 +29,20 @@
             <div class="up">
               <img :src="upImgUrl" alt="">
             </div>
-            <p>手持正面身份证</p>
+            <p>身份证正面</p>
           </div>
           <div class="fr" @click="choosePhoto('back')">
             <div class="back">
               <img :src="backImgUrl" alt="">
             </div>
-            <p>手持背面身份证</p>
+            <p>身份证背面</p>
           </div>
         </div>
       </div>
       <div class="open-type-choose pd-1">
         <p>商家类型（单选，选择后不能更改）</p>
         <button :class="{select:merchantType==='A'}" @click="chooseMerchantType('A')" class="fl">农家自产</button>
-        <button :class="{select:merchantType==='B'}" @click="chooseMerchantType('B')" class="fr">新鲜商铺</button>
+        <button :class="{select:merchantType==='B'}" @click="chooseMerchantType('B')" class="fr">附近商铺</button>
       </div>
     </section>
     <footer>
@@ -74,7 +74,6 @@
         idCardFront: "",
         idCardBack: "",
         merchantType: "A",
-        userId: "f2f41aed-3bd9-420c-93e8-7836a4aa0eab",
         idCardType:"",
         reg:{},
         realNameErrMsg:'',
@@ -194,23 +193,13 @@
           canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
           console.log(this.idCardType);
           if(this.idCardType ==='front'){
-            this.idCardFront = canvas.toDataURL()
+            this.idCardFront = canvas.toDataURL().split(',')[1]
           }else{
-            this.idCardBack = canvas.toDataURL()
+            this.idCardBack = canvas.toDataURL().split(',')[1]
           }
-//          let name = new Date().getTime()+'.png'
-//
-//          this.uploadImg(111111,'ID_CARD_FROND',name,this.base64Url)
         }
       },
       openShop () {
-//        console.log('realName:',this.realName)
-//        console.log('phone:',this.phone)
-//        console.log('idCardNo:',this.idCardNo)
-//        console.log('idCardFront:',this.idCardFront)
-//        console.log('idCardBack:',this.idCardBack)
-//        console.log('merchantType:',this.merchantType)
-//        console.log('userId:',this.userId)
         let arr = ['name','tel','idCard']
         for (let i = 0;i<arr.length;i++){
           if(!this.inputBlur(arr[i])){
@@ -223,13 +212,26 @@
             return
         }
         Indicator.open('上传中...');
-//        openShop(this.realName,this.phone,this.idCardNo,this.idCardFront,this.idCardBack,this.merchantType,this.userId).then(res=>{
-//          console.log(res);
-//          Indicator.close();
-//        }).catch(err=>{
-//            console.log(err)
-//          Indicator.close();
-//        })
+        let shopInfo = {
+          realName: this.realName,
+          phone: this.phone,
+          idCardNo: this.idCardNo,
+          idCardFront: this.idCardFront,
+          idCardBack: this.idCardBack,
+          merchantType: this.merchantType,
+          userId: sessionStorage.getItem('userID')
+        }
+        console.log(shopInfo)
+        openShop(shopInfo).then(res=>{
+          console.log(res);
+          Indicator.close();
+          alert('开店成功，转到店铺页面')
+          this.$router.push({name:'MyShop'})
+        }).catch(err=>{
+            alert('开店失败，请重试')
+            console.log(err)
+          Indicator.close();
+        })
       }
     },
     mounted () {

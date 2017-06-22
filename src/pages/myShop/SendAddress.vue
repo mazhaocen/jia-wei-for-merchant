@@ -170,7 +170,11 @@
               history.go(-1)
               console.log(res.data.content)
             }).catch(err =>{
-              console.log(err.response)
+              Toast({
+                message: '修改失败，请重试',
+              });
+              console.log(JSON.stringify(err.response))
+              console.log(JSON.stringify(err))
               Indicator.close()
             })
           }else{

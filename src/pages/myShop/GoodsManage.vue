@@ -35,7 +35,7 @@
 
 <script>
   import Header from '@/components/Head'
-  import { MessageBox, Indicator } from 'mint-ui';
+  import { MessageBox, Indicator ,Toast} from 'mint-ui';
   import {getGoodsManageList,getGoodsList,goodsManage} from '../../service/service'
 export default {
   name: 'GoodsManage',
@@ -146,12 +146,23 @@ export default {
             sessionStorage.setItem('goodsData',JSON.stringify(data))
             this.deleteSure(item,index)
           }
+          Toast({
+            message: '操作成功！',
+            iconClass: 'mintui mintui-success'
+          });
 
 
         }
       }).catch(err=>{
-        console.log('baocuole')
+
+        Indicator.close()
+        Toast({
+          message: '操作失败，请重试！',
+        });
+        console.log(err)
         console.log(err.response)
+        console.log(JSON.stringify(err.response))
+        console.log(JSON.stringify(err))
       })
 
     },
@@ -261,6 +272,7 @@ export default {
   .goods-info_img{
     width:8.25rem;
     height:5.444rem;
+    margin-right: 1rem;
   }
   .goods-type>li:last-child{
     border:none;

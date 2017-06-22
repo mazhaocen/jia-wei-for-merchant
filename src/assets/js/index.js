@@ -21,8 +21,8 @@ window.onload = function () {
     }, function (ret) {
       if (ret) {
 
-        var  arr = ['index'];
-        if(arr.indexOf(window.page)!=-1) {
+        var  arr = ['index','myShop'];
+        if(arr.indexOf(window.page)!==-1) {
           if ((new Date().getTime() - mkeyTime) > 2000) {
             mkeyTime = new Date().getTime();
             api.toast({
@@ -33,7 +33,10 @@ window.onload = function () {
           } else {
             api.closeWidget();
           }
-        }else{
+        }else if(window.page==='imageClip'){
+            let FNImageClip = api.require('FNImageClip');
+            FNImageClip.close();
+        } else{
           history.go(-1)
         }
       }

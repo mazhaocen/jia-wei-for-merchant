@@ -22,10 +22,12 @@
         takeTime: new Date().getTime(),
 //        width: window.screen.width,
 //        height: window.screen.height - 125,
-        imagePath: ''
+        imagePath: '',
+        clipShow:true
       }
     },
     created(){
+      window.page = 'imageClip'
         var FNImageClip = api.require('FNImageClip');
         FNImageClip.open({
           rect: {
@@ -86,8 +88,41 @@
         let FNImageClip = api.require('FNImageClip');
         FNImageClip.reset();
       }
+    },
+    mounted(){
+      let mkeyTime = new Date().getTime();
+      api.addEventListener({
+        name: 'keyback'
+      }, (ret) =>{
+
+        if (ret) {
+          let  arr = ['index','myShop'];
+          if(arr.indexOf(window.page)!==-1) {
+            if ((new Date().getTime() - mkeyTime) > 2000) {
+              mkeyTime = new Date().getTime();
+              api.toast({
+                msg: '再按一次退出程序',
+                duration: 2000,
+                location: 'bottom'
+              });
+            } else {
+              api.closeWidget();
+            }
+          }else if(window.page==='imageClip'){
+            let FNImageClip = api.require('FNImageClip');
+            FNImageClip.close();
+            this.$emit('clipImage','')
+          } else{
+            history.go(-1)
+          }
+        }
+      });
+    },
+    destroyed () {
+      window.page = ''
     }
   }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

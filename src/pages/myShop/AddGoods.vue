@@ -9,7 +9,7 @@
         <div class="pd-1 goods-title pr">
           <p>输入商品的标题</p>
           <input type="text" v-model.trim="item.title" maxlength="30" v-on:blur="inputBlur(item.title,'title')" >
-          <span>{{item.title.length}}/30</span>
+          <span style="line-height: 3rem;">{{item.title.length}}/30</span>
           <b>{{titleErrMsg}}</b>
         </div>
         <div class="goods-msg">
@@ -73,7 +73,6 @@
         titleErrMsg:'',
         typeErrMsg:'',
         descriptionErr:'',
-        goodsImg:'',
         imgUrl:'',
         imageClip:false
       }
@@ -228,9 +227,11 @@
         });
       },
       resultImage (url) {  //图片地址
-        this.getBase64Image(url)
+        if(url){
+          this.getBase64Image(url)
+          this.item.headImageLink = url
+        }
         this.imageClip = false
-        this.goodsImg = url
       },
       getBase64Image (url,callback) {//转base64
         let img = new Image();
@@ -259,9 +260,11 @@
         }).catch(err=>{
             console.log(err)
             console.log(err.response)
+          console.log(JSON.stringify(err))
+          console.log(JSON.stringify(err.response))
           Indicator.close()
           Toast({
-            message: '保存失败',
+            message: '保存失败,请重试！',
           });
         })
       }

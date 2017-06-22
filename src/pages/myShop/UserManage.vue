@@ -3,7 +3,7 @@
     <el-header className="go_back" title='用户管理'></el-header>
     <section class="content manage-cell" style="padding-bottom: 0">
       <p>店铺信息</p>
-      <div class="shop_img" @click="sheetVisible = true">
+      <div class="shop_img" @click="showGetType">
         <p>店铺头像</p>
         <span>
           <i><img :src="shopImg" alt=""></i>
@@ -53,33 +53,21 @@
       }
     },
     created(){
-      let shopInfo = JSON.parse(sessionStorage.getItem('shopInfo'))
-      console.log(shopInfo)
-      this.shopImg = shopInfo.logoLink
-      this.shopName = shopInfo.name
-      this.shopSign = shopInfo.slogan
-      let shopAddress = shopInfo.mainContact
-      if(shopAddress){
-        this.selectAddress = shopAddress.province+shopAddress.city+shopAddress.district
-        this.inputAddress = shopInfo.mainContact.address
-      }else{
-        this.selectAddress = ''
-        this.inputAddress = ''
-      }
-//      if (sessionStorage.getItem('takePhotoUrl')) {
-//        this.shopImg = sessionStorage.getItem('takePhotoUrl')
-//        sessionStorage.removeItem('takePhotoUrl')
-//      }
-//      if (sessionStorage.getItem('name')) {
-//        this.shopName = sessionStorage.getItem('name')
-//      }
-//      if (sessionStorage.getItem('sign')) {
-//        this.shopSign = sessionStorage.getItem('sign')
-//      }
-//      if (sessionStorage.getItem('inputAddress') && sessionStorage.getItem('selectAddress')) {
-//        this.selectAddress = sessionStorage.getItem('selectAddress')
-//        this.inputAddress = sessionStorage.getItem('inputAddress')
-//      }
+        if(sessionStorage.getItem('shopInfo')){
+          let shopInfo = JSON.parse(sessionStorage.getItem('shopInfo'))
+          console.log(shopInfo)
+          this.shopImg = shopInfo.logoLink
+          this.shopName = shopInfo.name
+          this.shopSign = shopInfo.slogan
+          let shopAddress = shopInfo.mainContact
+          if(shopAddress){
+            this.selectAddress = shopAddress.province+shopAddress.city+shopAddress.district
+            this.inputAddress = shopInfo.mainContact.address
+          }else{
+            this.selectAddress = ''
+            this.inputAddress = ''
+          }
+        }
     },
     components: {
       'el-header': Header,
@@ -87,6 +75,13 @@
       'image-clip': ImageClip
     },
     methods: {
+      showGetType(){
+        if(sessionStorage.getItem('shopInfo')){
+          this.sheetVisible = true
+        }else{
+          alert('您还没有店铺，请先开店')
+        }
+      },
       takePhoto () { //拍照
         this.getPhoto('camera')
       },
@@ -153,10 +148,18 @@
       },
       // 前往编辑页面
       goToShopSignature (title, e) {
-        this.$router.push({name: 'ShopSignature', params: {title: title}})
+        if(sessionStorage.getItem('shopInfo')){
+          this.$router.push({name: 'ShopSignature', params: {title: title}})
+        }else{
+          alert('您还没有店铺，请先开店')
+        }
       },
       goToSendAddress (e) {
-        this.$router.push({name: 'SendAddress'})
+        if(sessionStorage.getItem('shopInfo')){
+          this.$router.push({name: 'SendAddress'})
+        }else{
+          alert('您还没有店铺，请先开店')
+        }
       },
       loginOut(){
         MessageBox({

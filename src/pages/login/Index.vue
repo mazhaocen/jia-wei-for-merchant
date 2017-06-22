@@ -45,6 +45,9 @@
     },
     mounted(){
 
+    },
+    destroyed () {
+      window.page=''
     }
   }
 </script>
