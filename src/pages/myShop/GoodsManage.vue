@@ -146,13 +146,11 @@ export default {
             sessionStorage.setItem('goodsData',JSON.stringify(data))
             this.deleteSure(item,index)
           }
-          Toast({
-            message: '操作成功！',
-            iconClass: 'mintui mintui-success'
-          });
-
-
         }
+        Toast({
+          message: '操作成功！',
+          iconClass: 'mintui mintui-success'
+        });
       }).catch(err=>{
 
         Indicator.close()
@@ -188,13 +186,16 @@ export default {
     },
     // 数据存储处理
     goodsStorage(item,data1,data2) {
-      let data = JSON.parse(sessionStorage.getItem(data1))
-      for (let i = 0;i<data.length;i++){
+      if(sessionStorage.getItem(data1)){
+        let data = JSON.parse(sessionStorage.getItem(data1))
+        console.log(data)
+        for (let i = 0;i<data.length;i++){
           if(item.id===data[i].id){
             data.splice(i,1)
           }
+        }
+        sessionStorage.setItem(data1,JSON.stringify(data))
       }
-      sessionStorage.setItem(data1,JSON.stringify(data))
 
       if(sessionStorage.getItem(data2)){
         let data = JSON.parse(sessionStorage.getItem(data2))
